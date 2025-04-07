@@ -22,27 +22,7 @@ const Home = () => {
     <>
       <div className="container-fluid">
         <Navbar />
-
-        {/* 🔍 Search + Filter (Just below Navbar) */}
-        <div className="container w-100 my-3 d-flex justify-content-center">
-
-          <div className="d-flex justify-content-center w-100 gap-2">
-            <input
-              type="text"
-              className="form-control w-25"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <button className="btn btn-warning" onClick={handleFilter}>
-              Filter
-            </button>
-          </div>
-        </div>
-
-      
-
-        <AllMatches home="home" searchTerm={searchTerm} />
+        <AllMatches home="home"/>
       </div>
 
       <FilterButtonWithModal />
