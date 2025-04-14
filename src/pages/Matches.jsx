@@ -3,7 +3,7 @@ import VerticleNav from "../components/verticleNav";
 import Navbar from "../components/Header/header";
 import axios from "axios";
 import "../style/matches.css";
-
+import MatchDetailsPopup from '../components/models/showMatchDetails';
 const AllMatches = () => {
   const [matches, setMatches] = useState([]);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
@@ -248,20 +248,20 @@ const AllMatches = () => {
                             <div className="d-flex justify-content-between align-items-center mb-1">
                               <div className="d-flex align-items-center">
                                 <i className="fas fa-baseball-bat-ball fa-1x text-warning me-1"></i>
-                                <p className="mb-0 fw-bold">{match.category}</p>
+                                <p className="mb-0 fw-bold">{match.user.username}</p>
                               </div>
-                              <p className="text-muted small mb-0">Starts: {match.match_datetime}</p>
+                              <p className="text-muted small mb-0">{match.category}</p>
                             </div>
 
                             <div className="row align-items-center">
                               <div className="col-4 text-center">
                                 <p className="mb-0 text-danger fw-bold">
-                                  Overs <br />
-                                  <span className="text-muted small">{match.overs}</span>
+                                 
+                                  <span className="text-muted small"><MatchDetailsPopup /></span>
                                 </p>
                               </div>
                               <div className="col-4 text-right">
-                                <p className="mb-1 small">{match.user.username}</p>
+                               
                                 <span className={`badge small ${
                                   match.match_status === "available" ? "bg-success text-black" :
                                     match.match_status === "booked" ? "bg-danger text-black" :

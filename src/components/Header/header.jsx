@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import ProfileUpdateModal from "../Edit_profile";
-import CreateMatchModal from "../models/createNewMatch"; // Assuming you have a CreateMatchModal component
+import CreateMatchModal from "../models/createNewMatch";
 import logo from "../../assets/images/logo512.png";
 import Notifications from "../models/NotificationPop";
 
