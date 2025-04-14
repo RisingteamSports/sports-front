@@ -112,7 +112,7 @@ const MatchDetailsPopup = () => {
 
                                     {/* Action Buttons */}
                                     <div className="d-flex gap-3">
-                                        <button className="btn btn-primary">Join Match</button>
+                                        <button className="btn btn-primary">Request Match</button>
                                         <button className="btn btn-outline-secondary">Contact Organizer</button>
                                     </div>
                                 </div>
