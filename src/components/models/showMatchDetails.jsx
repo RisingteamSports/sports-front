@@ -1,8 +1,42 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const MatchDetailsPopup = () => {
+const MatchDetailsPopup = ({ match }) => {
     const [showModal, setShowModal] = useState(false);
+
+    // Enhanced dummy data structure
+    const dummyData = {
+        team_members: [
+            { name: "Ali Khan", role: "Batsman", isCaptain: true },
+            { name: "Babar Azam", role: "Batsman" },
+            { name: "Shaheen Afridi", role: "Bowler" },
+            { name: "Shadab Khan", role: "All-rounder" },
+        ],
+        facilities: {
+            parking: "Available on-site",
+            dressing: "Changing rooms available",
+            equipment: "Bats, balls provided"
+        },
+        rules: [
+            "Standard T20 rules apply",
+            "Helmets mandatory for batsmen",
+            "No saliva on ball"
+        ],
+        organizer: {
+            name: "Karachi Sports Club",
+            contact: "+92 300 1234567",
+            email: "contact@karachisports.com"
+        },
+        weather: {
+            temp: "28°C",
+            condition: "Sunny",
+            humidity: "65%"
+        },
+        requirements: {
+            dress: "White sports attire",
+            equipment: "Bring own gloves"
+        }
+    };
 
     const handleOpen = (e) => {
         e.preventDefault();
@@ -13,107 +47,151 @@ const MatchDetailsPopup = () => {
 
     return (
         <>
-            {/* Trigger Button */}
-            <a href="#" onClick={handleOpen}>
+            <button 
+                onClick={handleOpen} 
+                className="btn btn-link p-0 border-0 text-decoration-none text-muted small"
+            >
                 Match Details
-            </a>
+            </button>
 
-            {/* Modal */}
             {showModal && (
-                <div className="custom-modal-overlay" onClick={handleClose}>
-                    <div
-                        className="card modal-dialog modal-md"
-                        onClick={(e) => e.stopPropagation()} // Prevent modal close when clicking inside
-                    >
+                <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-lg">
                         <div className="modal-content">
-                            <div className="modal-header">
+                            <div className="modal-header bg-primary text-white">
                                 <h5 className="modal-title">Match Details</h5>
                                 <button
                                     type="button"
-                                    className="btn-close text-danger"
-                                    aria-label="Close"
+                                    className="btn-close btn-close-white"
                                     onClick={handleClose}
-                                >
-                                    &times;
-                                </button>
+                                    aria-label="Close"
+                                ></button>
                             </div>
                             <div className="modal-body">
-                                {/* Match Card */}
-                                <div className="container match-card">
-                                    {/* Team Squad */}
-                                    <div className="mb-4">
-                                        <h4 className="mb-3">Team Squad</h4>
-                                        <div className="row g-3">
-                                            {[
-                                                { initials: "AK", name: "Ali Khan", role: "Batsman", captain: true },
-                                                { initials: "MR", name: "Mohammad Rizwan", role: "Wicket Keeper" },
-                                                { initials: "BA", name: "Babar Azam", role: "Batsman" },
-                                                { initials: "SA", name: "Shaheen Afridi", role: "Bowler" },
-                                                { initials: "SK", name: "Shadab Khan", role: "All Rounder" },
-                                            ].map((player, index) => (
-                                                <div className="col-md-4 d-flex align-items-center" key={index}>
-                                                    <div className="player-avatar me-3">{player.initials}</div>
-                                                    <div>
-                                                        <div className="fw-bold">
-                                                            {player.name}
-                                                            {player.captain && (
-                                                                <span className="captain-badge">Captain</span>
-                                                            )}
+                                <div className="container-fluid">
+                                    {/* Team Section */}
+                                    <div className="row mb-4">
+                                        <div className="col-12">
+                                            <h5 className="mb-3">Team Squad</h5>
+                                            <div className="row g-3">
+                                                {dummyData.team_members.map((member, index) => (
+                                                    <div className="col-md-6" key={index}>
+                                                        <div className="d-flex align-items-center p-2 bg-light rounded">
+                                                            <div className="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                                                                {member.name.split(' ').map(n => n[0]).join('')}
+                                                            </div>
+                                                            <div>
+                                                                <div className="fw-bold">
+                                                                    {member.name}
+                                                                    {member.isCaptain && (
+                                                                        <span className="badge bg-warning ms-2">Captain</span>
+                                                                    )}
+                                                                </div>
+                                                                <small className="text-muted">{member.role}</small>
+                                                            </div>
                                                         </div>
-                                                        <small className="text-muted">{player.role}</small>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Divider */}
-                                    <hr className="hr-divider" />
-
-                                    {/* Match Details */}
-                                    <div className="row mb-4">
+                                    {/* Match Info Grid */}
+                                    <div className="row g-4 mb-4">
                                         <div className="col-md-6">
-                                            <h4 className="mb-3">
-                                                Thunder Strikers{" "}
-                                                <span className="match-status">AVAILABLE</span>
-                                            </h4>
-                                            <ul className="list-group list-group-flush">
-                                                <li className="list-group-item">
-                                                    <strong>Category:</strong> Cricket
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <strong>Date & Time:</strong> June 15, 2023 at 2:00 PM
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <strong>Venue:</strong> National Stadium, Karachi
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <strong>Overs:</strong> 20
-                                                </li>
-                                            </ul>
+                                            <div className="card h-100">
+                                                <div className="card-header bg-light">
+                                                    <i className="fas fa-info-circle me-2"></i>
+                                                    Basic Info
+                                                </div>
+                                                <div className="card-body">
+                                                    <dl className="row mb-0">
+                                                        <dt className="col-6">Category:</dt>
+                                                        <dd className="col-6">{match.category}</dd>
+                                                        
+                                                        <dt className="col-6">Date:</dt>
+                                                        <dd className="col-6">{new Date(match.match_datetime).toLocaleDateString()}</dd>
+                                                        
+                                                        <dt className="col-6">Time:</dt>
+                                                        <dd className="col-6">{new Date(match.match_datetime).toLocaleTimeString()}</dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
                                         </div>
+                                        
                                         <div className="col-md-6">
-                                            <ul className="list-group list-group-flush mt-4 mt-md-0">
-                                                <li className="list-group-item">
-                                                    <strong>Ball Type:</strong> Tape Ball
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <strong>Security:</strong> Rs. 2000
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <strong>Match Bid:</strong> Rs. 500
-                                                </li>
-                                                <li className="list-group-item">
-                                                    <strong>Join Code:</strong> THUNDER2023
-                                                </li>
-                                            </ul>
+                                            <div className="card h-100">
+                                                <div className="card-header bg-light">
+                                                    <i className="fas fa-cogs me-2"></i>
+                                                    Match Specs
+                                                </div>
+                                                <div className="card-body">
+                                                    <dl className="row mb-0">
+                                                        <dt className="col-6">Overs:</dt>
+                                                        <dd className="col-6">20</dd>
+                                                        
+                                                        <dt className="col-6">Ball Type:</dt>
+                                                        <dd className="col-6">Leather</dd>
+                                                        
+                                                        <dt className="col-6">Security:</dt>
+                                                        <dd className="col-6">Rs. {match.security_amount || "None"}</dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Rules & Requirements */}
+                                    <div className="row g-4 mb-4">
+                                        <div className="col-md-6">
+                                            <div className="card h-100">
+                                                <div className="card-header bg-light">
+                                                    <i className="fas fa-scroll me-2"></i>
+                                                    Match Rules
+                                                </div>
+                                                <div className="card-body">
+                                                    <ul className="list-unstyled mb-0">
+                                                        {dummyData.rules.map((rule, index) => (
+                                                            <li key={index} className="d-flex mb-2">
+                                                                <i className="fas fa-angle-right text-primary me-2 mt-1"></i>
+                                                                {rule}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="col-md-6">
+                                            <div className="card h-100">
+                                                <div className="card-header bg-light">
+                                                    <i className="fas fa-clipboard-list me-2"></i>
+                                                    Requirements
+                                                </div>
+                                                <div className="card-body">
+                                                    <ul className="list-unstyled mb-0">
+                                                        <li className="d-flex mb-2">
+                                                            <i className="fas fa-tshirt text-primary me-2 mt-1"></i>
+                                                            {dummyData.requirements.dress}
+                                                        </li>
+                                                        <li className="d-flex mb-2">
+                                                            <i className="fas fa-baseball-ball text-primary me-2 mt-1"></i>
+                                                            {dummyData.requirements.equipment}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="d-flex gap-3">
-                                        <button className="btn btn-primary">Request Match</button>
-                                        <button className="btn btn-outline-secondary">Contact Organizer</button>
+                                    <div className="d-flex justify-content-center gap-3 mt-4">
+                                        <button className="btn btn-primary px-4">
+                                            <i className="fas fa-calendar-check me-2"></i>Join Match
+                                        </button>
+                                        <button className="btn btn-outline-secondary px-4">
+                                            <i className="fas fa-share me-2"></i>Share
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -121,74 +199,6 @@ const MatchDetailsPopup = () => {
                     </div>
                 </div>
             )}
-
-            {/* Styles */}
-            <style>{`
-                .custom-modal-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 15%;
-                    margin:auto;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    z-index: 1040;
-                }
-                .custom-modal {
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    z-index: 1050;
-                    width: 100%;
-                    max-width: 900px;
-                }
-                .modal-header {
-                    background-color: #f8f9fa; /* Light gray background */
-                    border-bottom: 1px solid #dee2e6;
-                    border-top-left-radius: 0.3rem;
-                    border-top-right-radius: 0.3rem;
-                }
-                .modal-content {
-                    border-radius: 0.5rem;
-                    overflow: hidden;
-                }
-                .match-card {
-                    background: white;
-                    border-radius: 10px;
-                    padding: 25px;
-                }
-                .player-avatar {
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 50%;
-                    background-color: #3498db;
-                    color: white;
-                    font-weight: bold;
-                    font-size: 18px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .captain-badge {
-                    background: #f39c12;
-                    color: white;
-                    padding: 2px 8px;
-                    border-radius: 10px;
-                    font-size: 12px;
-                    margin-left: 5px;
-                }
-                .hr-divider {
-                    border-top: 2px solid #dee2e6;
-                    margin: 30px 0;
-                }
-                .match-status {
-                    background: #2ecc71;
-                    color: white;
-                    padding: 5px 15px;
-                    border-radius: 20px;
-                    font-size: 14px;
-                    font-weight: bold;
-                }
-            `}</style>
         </>
     );
 };

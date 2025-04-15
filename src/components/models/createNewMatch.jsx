@@ -1,381 +1,473 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const CreateMatchModal = () => {
-  // Step management
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 2;
-
-  // Step 1 states - Team Information
-  const [teamName, setTeamName] = useState('');
-  const [captainName, setCaptainName] = useState('');
-  const [players, setPlayers] = useState([
-    { name: '', role: 'batsman', image: null }
-  ]);
-
-  // Step 2 states - Match Information
-  const [selectedCategory, setSelectedCategory] = useState({});
-  const [security, setSecurity] = useState('no');
-  const [securityAmount, setSecurityAmount] = useState('');
-  const [matchBid, setMatchBid] = useState('no');
-  const [matchDatetime, setMatchDatetime] = useState('');
-  const [ballType, setBallType] = useState('tape');
-  const [venue, setVenue] = useState('');
-  const [match_status, setMatch_status] = useState('available');
-  const [overs, setOvers] = useState('');
-  const [city, setCity] = useState('');
-  const [province, setProvince] = useState('');
-  const [joinCode, setJoinCode] = useState('');
+  const totalSteps = 3;
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
-  const API_URL = "https://matc.matchdada.com/public/api";
 
-  // Retrieve user ID from localStorage
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user ? user.id : null;
+  const [formData, setFormData] = useState({
+    teamName: '',
+    captainName: '',
+    players: [{ name: '', role: 'Batsman', image: null }],
+    category: '',
+    security: 'no',
+    securityAmount: '',
+    matchBid: 'no',
+    matchDatetime: '',
+    ballType: 'tape',
+    venue: '',
+    matchStatus: 'available',
+    overs: '',
+    province: '',
+    city: '',
+    joinCode: '',
+    rules: [],
+    facilities: {},
+    equipment: [],
+    dressCode: '',
+    paymentMethod: 'cash'
+  });
 
-  const categories = [
-    { name: 'Football', icon: 'fa-futbol' },
-    { name: 'Cricket', icon: 'fa-basketball-ball' },
-    { name: 'Tennis', icon: 'fa-volleyball-ball' },
-  ];
-
-  const provinces = [
+  const [provinces] = useState([
     'Punjab', 'Sindh', 'Khyber Pakhtunkhwa', 'Balochistan', 
     'Islamabad', 'Gilgit-Baltistan', 'Azad Jammu & Kashmir'
-  ];
+  ]);
 
-  const citiesByProvince = {
-    Punjab: ['Lahore', 'Faisalabad', 'Rawalpindi', 'Multan', 'Gujranwala'],
-    Sindh: ['Karachi', 'Hyderabad', 'Sukkur', 'Larkana'],
-    'Khyber Pakhtunkhwa': ['Peshawar', 'Abbottabad', 'Mardan', 'Swat'],
-    Balochistan: ['Quetta', 'Gwadar', 'Khuzdar', 'Turbat'],
-    Islamabad: ['Islamabad'],
-    'Gilgit-Baltistan': ['Gilgit', 'Skardu'],
-    'Azad Jammu & Kashmir': ['Muzaffarabad', 'Mirpur', 'Rawalakot'],
+  const [cities, setCities] = useState([]);
+  const [categories] = useState([
+    { name: 'Cricket', icon: 'fa-cricket' },
+    { name: 'Football', icon: 'fa-futbol' },
+    { name: 'Tennis', icon: 'fa-tennis-ball' }
+  ]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const API_URL = "https://matc.matchdada.com/public/api";
+
+  // Get cities based on selected province
+  const getCitiesByProvince = (province) => {
+    const citiesMap = {
+      Punjab: ['Lahore', 'Faisalabad', 'Rawalpindi', 'Multan'],
+      Sindh: ['Karachi', 'Hyderabad', 'Sukkur', 'Larkana'],
+      'Khyber Pakhtunkhwa': ['Peshawar', 'Abbottabad', 'Mardan'],
+      Balochistan: ['Quetta', 'Gwadar', 'Turbat'],
+      Islamabad: ['Islamabad'],
+      'Gilgit-Baltistan': ['Gilgit', 'Skardu'],
+      'Azad Jammu & Kashmir': ['Muzaffarabad', 'Mirpur']
+    };
+    return citiesMap[province] || [];
   };
 
-  const playerRoles = [
-    'batsman', 'bowler', 'all-rounder', 'wicket-keeper', 'captain'
-  ];
+  useEffect(() => {
+    if (formData.province) {
+      setCities(getCitiesByProvince(formData.province));
+    }
+  }, [formData.province]);
 
-  // Handle player input change
+  // Validation logic
+  const validateStep = (step) => {
+    const newErrors = {};
+    if (step === 1) {
+      if (!formData.teamName.trim()) newErrors.teamName = 'Team name is required';
+      if (!formData.captainName.trim()) newErrors.captainName = 'Captain name is required';
+      formData.players.forEach((player, index) => {
+        if (!player.name.trim()) newErrors[`player${index}Name`] = 'Player name is required';
+      });
+    }
+    if (step === 2) {
+      if (!formData.category) newErrors.category = 'Category is required';
+      if (!formData.matchDatetime) newErrors.matchDatetime = 'Match date/time is required';
+      if (formData.security === 'yes' && !formData.securityAmount) 
+        newErrors.securityAmount = 'Security amount is required';
+      if (!formData.venue) newErrors.venue = 'Venue is required';
+      if (!formData.overs) newErrors.overs = 'Overs are required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+  };
+
   const handlePlayerChange = (index, field, value) => {
-    const updatedPlayers = [...players];
+    const updatedPlayers = [...formData.players];
     updatedPlayers[index][field] = value;
-    setPlayers(updatedPlayers);
+    setFormData(prev => ({ ...prev, players: updatedPlayers }));
   };
 
-  // Handle player image upload
-  const handleImageUpload = (index, e) => {
+  const handleImageUpload = async (index, e) => {
     const file = e.target.files[0];
     if (file) {
+      const base64 = await convertToBase64(file);
+      handlePlayerChange(index, 'image', base64);
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        handlePlayerChange(index, 'image', reader.result);
-      };
       reader.readAsDataURL(file);
-    }
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
   };
 
-  // Add a new player
-  const addPlayer = () => {
-    if (players.length < 11) {
-      setPlayers([...players, { name: '', role: 'batsman', image: null }]);
-    }
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setFormData(prev => ({ ...prev, category: category.name }));
   };
 
-  // Remove a player
-  const removePlayer = (index) => {
-    if (players.length > 1) {
-      const updatedPlayers = [...players];
-      updatedPlayers.splice(index, 1);
-      setPlayers(updatedPlayers);
-    }
-  };
-
-  // Generate a random join code
-  const generateJoinCode = () => {
-    const code = Math.random().toString(36).substr(2, 8).toUpperCase();
-    setJoinCode(code);
-  };
-
-  // Check if step 1 is complete (minimum 1 player required)
-  const isStep1Complete = () => {
-    return (
-      teamName.trim() !== '' &&
-      captainName.trim() !== '' &&
-      players[0].name.trim() !== '' // At least first player must be filled
-    );
-  };
-
-  // Handle category selection
-  const handleCategorySelect = (category) => setSelectedCategory(category);
-
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!userId) {
-      alert("User not found. Please log in.");
-      return;
-    }
-
-    const matchData = {
-      user_id: userId,
-      team_name: teamName,
-      captain_name: captainName,
-      players: players,
-      category: selectedCategory.name || '',
-      security,
-      security_amount: security === 'yes' ? securityAmount : null,
-      match_bid: matchBid,
-      match_datetime: matchDatetime,
-      ball_type: ballType,
-      venue,
-      match_status,
-      overs,
-      join_code: joinCode,
-      city,
-      province,
-    };
-
-    console.log(matchData);
-
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("No auth token found.");
-      setToast({ show: true, message: "No authentication token found. Please log in.", type: "error" });
-      return;
-    }
-
+    setSubmitting(true);
     try {
-      const response = await axios.post(
-        `${API_URL}/matches`,
-        matchData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error('Authentication required');
+      if (!user?.id) throw new Error('User information missing');
+  
+      // Prepare the payload with correct field names expected by the API
+      const payload = {
+        user_id: user.id,  // Changed from userId to user_id
+        team_name: formData.teamName,  // Changed from teamName to team_name
+        captain_name: formData.captainName,
+        players: formData.players.map(player => ({
+          name: player.name,
+          role: player.role.toLowerCase().replace(' ', '_'),
+          image: player.image
+        })),
+        category: formData.category,
+        security: formData.security,
+        security_amount: formData.security === 'yes' ? formData.securityAmount : null,  // Changed from securityAmount
+        match_bid: formData.matchBid,  // Changed from matchBid
+        match_datetime: new Date(formData.matchDatetime).toISOString(),  // Changed from matchDatetime
+        ball_type: formData.ballType,  // Changed from ballType
+        venue: formData.venue,
+        match_status: formData.matchStatus,  // Changed from matchStatus
+        overs: formData.overs,
+        province: formData.province,
+        city: formData.city,
+        join_code: formData.joinCode || generateJoinCode(),  // Changed from joinCode
+        rules: formData.rules,
+        facilities: formData.facilities,
+        equipment: formData.equipment,
+        dress_code: formData.dressCode,  // Changed from dressCode
+        payment_method: formData.paymentMethod  // Changed from paymentMethod
+      };
+  console.log(payload);
+      const response = await axios.post(`${API_URL}/matches`, payload, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      );
-      console.log("Match created:", response.data);
-      setToast({ show: true, message: "Match created successfully!", type: "success" });
-    } catch (error) {
-      if (error.response && error.response.status === 409) {
-        setToast({ show: true, message: "Join code already exists. Please generate a new code.", type: "error" });
-        generateJoinCode();
+      });
+  
+      if (response.data.success) {
+        showToast('Match created successfully!', 'success');
+        setTimeout(() => window.location.reload(), 2000);
       } else {
-        console.error("Error creating match:", error);
-        setToast({ show: true, message: "An error occurred. Please try again.", type: "error" });
+        // Handle API-specific error messages
+        const errorMsg = response.data.message || 'Failed to create match';
+        if (response.data.errors) {
+          // Convert errors object to readable string
+          const errorString = Object.entries(response.data.errors)
+            .map(([field, errors]) => `${field}: ${errors.join(', ')}`)
+            .join('; ');
+          throw new Error(errorString);
+        }
+        throw new Error(errorMsg);
       }
+    } catch (error) {
+      const message = error.response?.data?.message || 
+                     error.response?.data?.errors ? 
+                     JSON.stringify(error.response.data.errors) : 
+                     error.message;
+      showToast(message, 'error');
+      if (error.response?.status === 409) {
+        setFormData(prev => ({ ...prev, joinCode: generateJoinCode() }));
+      }
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  const showToast = (message, type) => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast(prev => ({ ...prev, show: false })), 5000);
+  };
+
+  const generateJoinCode = () => {
+    const code = Math.random().toString(36).substr(2, 8).toUpperCase();
+    return code;
+  };
+
+  // Add match rules
+  const addRule = () => {
+    setFormData(prev => ({
+      ...prev,
+      rules: [...prev.rules, '']
+    }));
+  };
+
+  // Update match rule
+  const updateRule = (index, value) => {
+    const updatedRules = [...formData.rules];
+    updatedRules[index] = value;
+    setFormData(prev => ({ ...prev, rules: updatedRules }));
+  };
+
+  // Remove match rule
+  const removeRule = (index) => {
+    const updatedRules = formData.rules.filter((_, i) => i !== index);
+    setFormData(prev => ({ ...prev, rules: updatedRules }));
   };
 
   return (
-    <>
-      {/* Toast Notification */}
-      <div
-        className={`toast position-fixed top-0 end-0 m-3 ${toast.show ? "show" : "hide"}`}
-        style={{ zIndex: 1050 }}
-      >
-        <div className={`toast-header bg-${toast.type} text-white`}>
-          <strong className="me-auto">
-            {toast.type === "success" ? "Success" : "Error"}
-          </strong>
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setToast({ show: false, message: "", type: "" })}
-          ></button>
-        </div>
-        <div className="toast-body">{toast.message}</div>
-      </div>
+    <div className="modal fade" id="createMatchModal" tabIndex="-1">
+      <div className="modal-dialog modal-xl">
+        <div className="modal-content">
+          <div className="modal-header bg-primary text-white">
+            <h5 className="modal-title">Create New Match</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+          </div>
 
-      {/* Create Match Modal */}
-      <div id="createMatchModal" className="modal fade" tabIndex="-1">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Create New Match (Step {currentStep} of {totalSteps})</h5>
-              <button type="button" className="btn-close text-danger" data-bs-dismiss="modal" aria-label="Close">
-                <i className="fas fa-times"></i>
-              </button>
+          <div className="modal-body">
+            {/* Stepper */}
+            <div className="stepper-wrapper mb-5">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className={`stepper-item ${currentStep === step ? 'active' : ''} ${currentStep > step ? 'completed' : ''}`}>
+                  <div className="step-counter">
+                    {currentStep > step ? <i className="fas fa-check"></i> : step}
+                  </div>
+                  <div className="step-name">Step {step}</div>
+                </div>
+              ))}
             </div>
 
-            <div className="modal-body">
-              {/* Progress Bar */}
-              <div className="progress mb-4">
-                <div 
-                  className="progress-bar bg-success" 
-                  role="progressbar" 
-                  style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                  aria-valuenow={currentStep}
-                  aria-valuemin="1"
-                  aria-valuemax={totalSteps}
-                ></div>
-              </div>
-
-              {/* Step 1: Team Information */}
-              {currentStep === 1 && (
-                <div className="team-info-step">
-                  <div className="row mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label">Team Name</label>
+            {/* Step 1: Team Information */}
+            {currentStep === 1 && (
+              <div className="team-info-step">
+                <div className="row g-4">
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">Team Name <span className="text-danger">*</span></label>
                       <input
                         type="text"
-                        className="form-control"
-                        value={teamName}
-                        onChange={(e) => setTeamName(e.target.value)}
-                        placeholder="Enter your team name"
-                        required
+                        className={`form-control form-control-lg ${errors.teamName ? 'is-invalid' : ''}`}
+                        value={formData.teamName}
+                        onChange={e => setFormData(prev => ({ ...prev, teamName: e.target.value }))}
                       />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Captain Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={captainName}
-                        onChange={(e) => setCaptainName(e.target.value)}
-                        placeholder="Enter captain name"
-                        required
-                      />
+                      {errors.teamName && <div className="invalid-feedback">{errors.teamName}</div>}
                     </div>
                   </div>
 
-                  <h5 className="mt-4 mb-3">Team Members (1-11 Players)</h5>
-                  <div className="players-container">
-                    {players.map((player, index) => (
-                      <div key={index} className="player-card mb-3">
-                        <div className="card">
-                          <div className="card-body p-2">
-                            <div className="row align-items-center">
-                              {/* Player Image */}
-                              <div className="col-md-2 text-center">
-                                {player.image ? (
-                                  <img 
-                                    src={player.image} 
-                                    alt={`Player ${index + 1}`} 
-                                    className="img-thumbnail rounded-circle mb-1"
-                                    style={{ width: '60px', height: '60px', objectFit: 'cover' }}
-                                  />
-                                ) : (
-                                  <div className="bg-light rounded-circle d-flex align-items-center justify-content-center mb-1 mx-auto"
-                                    style={{ width: '60px', height: '60px' }}>
-                                    <i className="fas fa-user text-secondary"></i>
-                                  </div>
-                                )}
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">Captain Name <span className="text-danger">*</span></label>
+                      <input
+                        type="text"
+                        className={`form-control form-control-lg ${errors.captainName ? 'is-invalid' : ''}`}
+                        value={formData.captainName}
+                        onChange={e => setFormData(prev => ({ ...prev, captainName: e.target.value }))}
+                      />
+                      {errors.captainName && <div className="invalid-feedback">{errors.captainName}</div>}
+                    </div>
+                  </div>
+
+                  <div className="col-12">
+                    <h5 className="mt-4 mb-3 text-primary">Team Members <small className="text-muted">(1-11 Players)</small></h5>
+                    {formData.players.map((player, index) => (
+                      <div key={index} className="card mb-3 shadow-sm">
+                        <div className="card-body py-2">
+                          <div className="row align-items-center g-3">
+                            <div className="col-md-2">
+                              <div className="avatar-upload">
                                 <input
                                   type="file"
-                                  className="form-control form-control-sm"
+                                  className="d-none"
+                                  id={`playerImage${index}`}
+                                  onChange={e => handleImageUpload(index, e)}
                                   accept="image/*"
-                                  onChange={(e) => handleImageUpload(index, e)}
-                                  style={{ fontSize: '0.75rem' }}
                                 />
-                              </div>
-                              
-                              {/* Player Details */}
-                              <div className="col-md-8">
-                                <div className="row g-2">
-                                  <div className="col-md-8">
-                                    <input
-                                      type="text"
-                                      className="form-control form-control-sm"
-                                      value={player.name}
-                                      onChange={(e) => handlePlayerChange(index, 'name', e.target.value)}
-                                      placeholder="Player name"
+                                <label 
+                                  htmlFor={`playerImage${index}`} 
+                                  className="avatar-preview rounded-circle overflow-hidden d-block"
+                                  style={{
+                                    width: '80px',
+                                    height: '80px',
+                                    border: '2px solid #dee2e6',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {player.image ? (
+                                    <img 
+                                      src={player.image} 
+                                      alt={`Player ${index + 1}`}
+                                      className="w-100 h-100 object-fit-cover" 
                                     />
-                                  </div>
-                                  <div className="col-md-4">
-                                    <select
-                                      className="form-select form-select-sm"
-                                      value={player.role}
-                                      onChange={(e) => handlePlayerChange(index, 'role', e.target.value)}
-                                    >
-                                      {playerRoles.map(role => (
-                                        <option key={role} value={role}>
-                                          {role.charAt(0).toUpperCase() + role.slice(1).replace('-', ' ')}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </div>
+                                  ) : (
+                                    <div className="d-flex align-items-center justify-content-center h-100 bg-light">
+                                      <i className="fas fa-camera fa-2x text-secondary"></i>
+                                    </div>
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+
+                            <div className="col-md-8">
+                              <div className="row g-2">
+                                <div className="col-md-8">
+                                  <input
+                                    type="text"
+                                    className={`form-control ${errors[`player${index}Name`] ? 'is-invalid' : ''}`}
+                                    placeholder="Player name"
+                                    value={player.name}
+                                    onChange={e => handlePlayerChange(index, 'name', e.target.value)}
+                                  />
+                                  {errors[`player${index}Name`] && (
+                                    <div className="invalid-feedback">{errors[`player${index}Name`]}</div>
+                                  )}
+                                </div>
+                                <div className="col-md-4">
+                                  <select
+                                    className="form-select"
+                                    value={player.role}
+                                    onChange={e => handlePlayerChange(index, 'role', e.target.value)}
+                                  >
+                                    {['Batsman', 'Bowler', 'All-Rounder', 'Wicket Keeper'].map(role => (
+                                      <option key={role} value={role}>{role}</option>
+                                    ))}
+                                  </select>
                                 </div>
                               </div>
-                              
-                              {/* Remove Button */}
-                              <div className="col-md-2 text-end">
-                                {players.length > 1 && (
-                                  <button
-                                    type="button"
-                                    className="btn btn-sm btn-outline-danger"
-                                    onClick={() => removePlayer(index)}
-                                  >
-                                    <i className="fas fa-times"></i>
-                                  </button>
-                                )}
-                              </div>
+                            </div>
+
+                            <div className="col-md-2 text-end">
+                              {formData.players.length > 1 && (
+                                <button
+                                  type="button"
+                                  className="btn btn-danger btn-sm rounded-circle"
+                                  style={{ width: '32px', height: '32px' }}
+                                  onClick={() => setFormData(prev => ({
+                                    ...prev,
+                                    players: prev.players.filter((_, i) => i !== index)
+                                  }))}
+                                >
+                                  <i className="fas fa-times"></i>
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>
                       </div>
                     ))}
-                    
-                    {/* Add Player Button */}
-                    {players.length < 11 && (
-                      <div className="text-center mt-2">
+
+                    {formData.players.length < 11 && (
+                      <div className="text-center mt-3">
                         <button
                           type="button"
-                          className="btn btn-sm btn-outline-primary"
-                          onClick={addPlayer}
+                          className="btn btn-outline-primary px-4"
+                          onClick={() => setFormData(prev => ({
+                            ...prev,
+                            players: [...prev.players, { name: '', role: 'Batsman', image: null }]
+                          }))}
                         >
-                          <i className="fas fa-plus me-1"></i> Add Player
+                          <i className="fas fa-plus me-2"></i>Add Player
                         </button>
                       </div>
                     )}
-                    
-                    <div className="text-muted small mt-2">
-                      Note: Minimum 1 player required. You can add up to 11 players.
-                    </div>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Step 2: Match Information */}
-              {currentStep === 2 && (
-                <div className="match-info-step">
-                  <div className="d-flex justify-content-between mb-3">
-                    <div>
-                      <label className="form-label">Category</label>
+            {/* Step 2: Match Details */}
+            {currentStep === 2 && (
+              <div className="match-details-step">
+                <div className="row g-4">
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">Sport Category <span className="text-danger">*</span></label>
                       <div className="dropdown">
-                        <button className="btn btn-light" type="button" data-bs-toggle="dropdown" style={{ width: "180px" }}>
-                          {selectedCategory.name ? (
-                            <><i className={`fas ${selectedCategory.icon} me-3`}></i>{selectedCategory.name}</>
-                          ) : "Select Category"}
+                        <button 
+                          className={`form-select form-select-lg text-start ${errors.category ? 'is-invalid' : ''}`}
+                          type="button" 
+                          data-bs-toggle="dropdown"
+                        >
+                          {selectedCategory ? (
+                            <>
+                              <i className={`fas ${selectedCategory.icon} me-2`}></i>
+                              {selectedCategory.name}
+                            </>
+                          ) : 'Select Category'}
                         </button>
-                        <ul className="dropdown-menu shadow">
+                        <ul className="dropdown-menu shadow w-100">
                           {categories.map((category) => (
                             <li key={category.name}>
-                              <a className="dropdown-item" href="#" onClick={() => handleCategorySelect(category)}>
+                              <button 
+                                className="dropdown-item" 
+                                type="button"
+                                onClick={() => handleCategorySelect(category)}
+                              >
                                 <i className={`fas ${category.icon} me-2`}></i> {category.name}
-                              </a>
+                              </button>
                             </li>
                           ))}
                         </ul>
+                        {errors.category && <div className="invalid-feedback">{errors.category}</div>}
                       </div>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="form-label">Security</label>
-                      <select className="form-select me-4" onChange={(e) => setSecurity(e.target.value)} style={{ width: "100px" }}>
-                        <option value="no">No</option>
-                        <option value="yes">Yes</option>
-                      </select>
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">Match Date & Time <span className="text-danger">*</span></label>
+                      <input
+                        type="datetime-local"
+                        className={`form-control form-control-lg ${errors.matchDatetime ? 'is-invalid' : ''}`}
+                        value={formData.matchDatetime}
+                        onChange={e => setFormData(prev => ({ ...prev, matchDatetime: e.target.value }))}
+                      />
+                      {errors.matchDatetime && <div className="invalid-feedback">{errors.matchDatetime}</div>}
                     </div>
+                  </div>
 
-                    <div>
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="form-label">Security Deposit</label>
+                      <div className="input-group">
+                        <select
+                          className="form-select"
+                          value={formData.security}
+                          onChange={e => setFormData(prev => ({ ...prev, security: e.target.value }))}
+                        >
+                          <option value="no">No</option>
+                          <option value="yes">Yes</option>
+                        </select>
+                        {formData.security === 'yes' && (
+                          <input
+                            type="number"
+                            className={`form-control ${errors.securityAmount ? 'is-invalid' : ''}`}
+                            placeholder="Amount"
+                            value={formData.securityAmount}
+                            onChange={e => setFormData(prev => ({ ...prev, securityAmount: e.target.value }))}
+                          />
+                        )}
+                      </div>
+                      {errors.securityAmount && <div className="invalid-feedback">{errors.securityAmount}</div>}
+                    </div>
+                  </div>
+
+                  <div className="col-md-4">
+                    <div className="form-group">
                       <label className="form-label">Match Bid</label>
-                      <select className="form-select" onChange={(e) => setMatchBid(e.target.value)} style={{ width: "100px" }}>
+                      <select
+                        className="form-select"
+                        value={formData.matchBid}
+                        onChange={e => setFormData(prev => ({ ...prev, matchBid: e.target.value }))}
+                      >
                         <option value="no">No</option>
                         <option value="yes">Yes</option>
                         <option value="100">100</option>
@@ -384,123 +476,397 @@ const CreateMatchModal = () => {
                     </div>
                   </div>
 
-                  {security === "yes" && (
-                    <div className="mb-3">
-                      <label className="form-label">Security Amount</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={securityAmount}
-                        onChange={(e) => setSecurityAmount(e.target.value)}
-                        placeholder="Enter security amount"
-                        min="0"
-                      />
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="form-label">Ball Type</label>
+                      <select
+                        className="form-select"
+                        value={formData.ballType}
+                        onChange={e => setFormData(prev => ({ ...prev, ballType: e.target.value }))}
+                      >
+                        <option value="tape">Tape Ball</option>
+                        <option value="hard">Hard Ball</option>
+                      </select>
                     </div>
-                  )}
-
-                  <div className="mb-3">
-                    <label className="form-label">Match Date & Time</label>
-                    <input type="datetime-local" className="form-control" onChange={(e) => setMatchDatetime(e.target.value)} />
                   </div>
 
-                  <div className="mb-3">
-                    <label className="form-label">Ball Type</label>
-                    <select className="form-select" onChange={(e) => setBallType(e.target.value)}>
-                      <option value="tape">Tape Ball</option>
-                      <option value="hard">Hard Ball</option>
-                    </select>
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Venue</label>
-                    <input type="text" className="form-control" onChange={(e) => setVenue(e.target.value)} placeholder="Enter venue" />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Overs</label>
-                    <input type="number" className="form-control" min={1} onChange={(e) => setOvers(e.target.value)} placeholder="Enter number of overs" />
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Province (Pakistan)</label>
-                    <select className="form-select" value={province} onChange={(e) => {
-                      setProvince(e.target.value);
-                      setCity('');
-                    }}>
-                      <option value="">Select Province</option>
-                      {provinces.map((prov) => <option key={prov} value={prov}>{prov}</option>)}
-                    </select>
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">City</label>
-                    <select className="form-select" value={city} onChange={(e) => setCity(e.target.value)} disabled={!province}>
-                      <option value="">Select City</option>
-                      {province && citiesByProvince[province]?.map((city) => (
-                        <option key={city} value={city}>{city}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Join Code</label>
-                    <div className="input-group">
+                  <div className="col-md-8">
+                    <div className="form-group">
+                      <label className="form-label">Venue <span className="text-danger">*</span></label>
                       <input
                         type="text"
-                        className="form-control"
-                        value={joinCode}
-                        onChange={(e) => setJoinCode(e.target.value)}
-                        placeholder="Enter or generate a join code"
+                        className={`form-control form-control-lg ${errors.venue ? 'is-invalid' : ''}`}
+                        value={formData.venue}
+                        onChange={e => setFormData(prev => ({ ...prev, venue: e.target.value }))}
                       />
+                      {errors.venue && <div className="invalid-feedback">{errors.venue}</div>}
+                    </div>
+                  </div>
+
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="form-label">Overs <span className="text-danger">*</span></label>
+                      <input
+                        type="number"
+                        className={`form-control form-control-lg ${errors.overs ? 'is-invalid' : ''}`}
+                        value={formData.overs}
+                        onChange={e => setFormData(prev => ({ ...prev, overs: e.target.value }))}
+                      />
+                      {errors.overs && <div className="invalid-feedback">{errors.overs}</div>}
+                    </div>
+                  </div>
+
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="form-label">Province</label>
+                      <select
+                        className="form-select form-select-lg"
+                        value={formData.province}
+                        onChange={e => setFormData(prev => ({ ...prev, province: e.target.value, city: '' }))}
+                      >
+                        <option value="">Select Province</option>
+                        {provinces.map(province => (
+                          <option key={province} value={province}>{province}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="form-label">City</label>
+                      <select
+                        className="form-select form-select-lg"
+                        value={formData.city}
+                        onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                        disabled={!formData.province}
+                      >
+                        <option value="">Select City</option>
+                        {cities.map(city => (
+                          <option key={city} value={city}>{city}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="col-md-4">
+                    <div className="form-group">
+                      <label className="form-label">Join Code</label>
+                      <div className="input-group">
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formData.joinCode}
+                          onChange={e => setFormData(prev => ({ ...prev, joinCode: e.target.value }))}
+                          placeholder="Auto-generated"
+                          readOnly
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary"
+                          onClick={() => setFormData(prev => ({ ...prev, joinCode: generateJoinCode() }))}
+                        >
+                          Generate
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-12">
+                    <div className="form-group">
+                      <label className="form-label">Match Rules</label>
+                      {formData.rules.map((rule, index) => (
+                        <div key={index} className="input-group mb-2">
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={rule}
+                            onChange={e => updateRule(index, e.target.value)}
+                            placeholder="Enter match rule"
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger"
+                            onClick={() => removeRule(index)}
+                          >
+                            <i className="fas fa-times"></i>
+                          </button>
+                        </div>
+                      ))}
                       <button
                         type="button"
-                        className="btn btn-outline-secondary"
-                        onClick={generateJoinCode}
+                        className="btn btn-outline-primary btn-sm mt-2"
+                        onClick={addRule}
                       >
-                        Generate Code
+                        <i className="fas fa-plus me-1"></i> Add Rule
                       </button>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
 
-            <div className="modal-footer">
-              {currentStep > 1 && (
-                <button 
-                  type="button" 
-                  className="btn btn-secondary me-auto"
-                  onClick={() => setCurrentStep(currentStep - 1)}
-                >
-                  Previous
-                </button>
-              )}
-              
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              
-              {currentStep < totalSteps ? (
-                <button 
-                  type="button" 
-                  className="btn btn-primary"
-                  onClick={() => setCurrentStep(currentStep + 1)}
-                  disabled={!isStep1Complete()}
-                >
-                  Next
-                </button>
-              ) : (
-                <button 
-                  type="button" 
-                  className="btn btn-success"
-                  onClick={handleSubmit}
-                >
-                  Create Match
-                </button>
-              )}
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">Dress Code</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={formData.dressCode}
+                        onChange={e => setFormData(prev => ({ ...prev, dressCode: e.target.value }))}
+                        placeholder="e.g., White jersey with dark pants"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">Payment Method</label>
+                      <select
+                        className="form-select"
+                        value={formData.paymentMethod}
+                        onChange={e => setFormData(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                      >
+                        <option value="cash">Cash</option>
+                        <option value="online">Online Payment</option>
+                        <option value="both">Both</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Review & Submit */}
+            {currentStep === 3 && (
+              <div className="review-step">
+                <div className="card mb-4 shadow">
+                  <div className="card-header bg-primary text-white py-3">
+                    <h6 className="mb-0">Team Information</h6>
+                  </div>
+                  <div className="card-body">
+                    <dl className="row mb-0">
+                      <dt className="col-sm-3 text-muted">Team Name</dt>
+                      <dd className="col-sm-9">{formData.teamName}</dd>
+
+                      <dt className="col-sm-3 text-muted">Captain</dt>
+                      <dd className="col-sm-9">{formData.captainName}</dd>
+
+                      <dt className="col-sm-3 text-muted">Players</dt>
+                      <dd className="col-sm-9">
+                        <div className="d-flex flex-wrap gap-2">
+                          {formData.players.map((player, index) => (
+                            <span key={index} className="badge bg-light text-dark border">
+                              {player.name} ({player.role})
+                            </span>
+                          ))}
+                        </div>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+
+                <div className="card shadow">
+                  <div className="card-header bg-primary text-white py-3">
+                    <h6 className="mb-0">Match Details</h6>
+                  </div>
+                  <div className="card-body">
+                    <dl className="row mb-0">
+                      <dt className="col-sm-3 text-muted">Category</dt>
+                      <dd className="col-sm-9">
+                        {selectedCategory && (
+                          <>
+                            <i className={`fas ${selectedCategory.icon} me-2`}></i>
+                            {formData.category}
+                          </>
+                        )}
+                      </dd>
+
+                      <dt className="col-sm-3 text-muted">Date & Time</dt>
+                      <dd className="col-sm-9">
+                        {new Date(formData.matchDatetime).toLocaleString()}
+                      </dd>
+
+                      <dt className="col-sm-3 text-muted">Venue</dt>
+                      <dd className="col-sm-9">{formData.venue}</dd>
+
+                      <dt className="col-sm-3 text-muted">Overs</dt>
+                      <dd className="col-sm-9">{formData.overs}</dd>
+
+                      <dt className="col-sm-3 text-muted">Location</dt>
+                      <dd className="col-sm-9">
+                        {formData.city}, {formData.province}
+                      </dd>
+
+                      <dt className="col-sm-3 text-muted">Ball Type</dt>
+                      <dd className="col-sm-9">{formData.ballType}</dd>
+
+                      <dt className="col-sm-3 text-muted">Match Bid</dt>
+                      <dd className="col-sm-9">{formData.matchBid}</dd>
+
+                      <dt className="col-sm-3 text-muted">Security</dt>
+                      <dd className="col-sm-9">
+                        {formData.security === 'yes' ? `Yes (${formData.securityAmount})` : 'No'}
+                      </dd>
+
+                      <dt className="col-sm-3 text-muted">Join Code</dt>
+                      <dd className="col-sm-9">{formData.joinCode}</dd>
+
+                      <dt className="col-sm-3 text-muted">Dress Code</dt>
+                      <dd className="col-sm-9">{formData.dressCode || 'Not specified'}</dd>
+
+                      <dt className="col-sm-3 text-muted">Payment Method</dt>
+                      <dd className="col-sm-9">{formData.paymentMethod}</dd>
+
+                      {formData.rules.length > 0 && (
+                        <>
+                          <dt className="col-sm-3 text-muted">Rules</dt>
+                          <dd className="col-sm-9">
+                            <ul className="mb-0">
+                              {formData.rules.map((rule, index) => (
+                                <li key={index}>{rule}</li>
+                              ))}
+                            </ul>
+                          </dd>
+                        </>
+                      )}
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="modal-footer">
+            <div className="w-100 d-flex justify-content-between">
+              <div>
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setCurrentStep(prev => prev - 1)}
+                  >
+                    Previous
+                  </button>
+                )}
+              </div>
+
+              <div>
+                {currentStep < totalSteps ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary px-4"
+                    onClick={handleNext}
+                    disabled={submitting}
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="btn btn-success px-4"
+                    onClick={handleSubmit}
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Creating...
+                      </>
+                    ) : 'Create Match'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`toast position-fixed bottom-0 end-0 m-3 ${toast.type === 'success' ? 'bg-success' : 'bg-danger'}`}>
+          <div className="toast-body text-white d-flex align-items-center">
+            <span>{toast.message}</span>
+            <button 
+              type="button" 
+              className="btn-close btn-close-white ms-auto" 
+              onClick={() => setToast(prev => ({ ...prev, show: false }))}
+            ></button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        .stepper-wrapper {
+          display: flex;
+          justify-content: space-between;
+          margin: 2rem 0 4rem;
+          position: relative;
+        }
+        
+        .stepper-wrapper::before {
+          content: '';
+          position: absolute;
+          top: 20px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background-color: #dee2e6;
+          z-index: -1;
+        }
+        
+        .stepper-item {
+          position: relative;
+          flex: 1;
+          text-align: center;
+          z-index: 1;
+        }
+        
+        .step-counter {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-color: #e9ecef;
+          color: #6c757d;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 0.5rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+        
+        .stepper-item.active .step-counter {
+          background-color: #0d6efd;
+          color: white;
+          transform: scale(1.1);
+        }
+        
+        .stepper-item.completed .step-counter {
+          background-color: #198754;
+          color: white;
+        }
+        
+        .step-name {
+          color: #6c757d;
+          font-weight: 500;
+          transition: color 0.3s ease;
+        }
+        
+        .stepper-item.active .step-name {
+          color: #0d6efd;
+          font-weight: 600;
+        }
+        
+        .avatar-preview:hover {
+          border-color: #0d6efd !important;
+          transform: scale(1.05);
+        }
+        
+        .toast {
+          min-width: 300px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+      `}</style>
+    </div>
   );
 };
 
