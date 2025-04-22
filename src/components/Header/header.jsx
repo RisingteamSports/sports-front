@@ -4,7 +4,7 @@ import ProfileUpdateModal from "../Edit_profile";
 import CreateMatchModal from "../models/createNewMatch";
 import logo from "../../assets/images/logo512.png";
 import Notifications from "../models/NotificationPop";
-
+import AccountSummaryModal from '../models/showalanceDetails';
 const Navbar = () => {
   const navigate = useNavigate();
   const [modalView, setModalView] = useState(null);
@@ -12,7 +12,17 @@ const Navbar = () => {
   const [profile, setProfile] = useState(
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM8LrGjiUDcvYjUMk7jUJJZo0kK4Y4NzKxmQ&s"
   );
-
+  const [showAccountModal, setShowAccountModal] = useState(false);
+  const accountStats = {
+    matchesWon: 12,
+    matchesLost: 5,
+    currentBalance: 8500,
+    transactionHistory: [
+      { id: 1, date: '2024-04-10', type: 'Win', amount: 500 },
+      { id: 2, date: '2024-04-08', type: 'Deposit', amount: 3000 },
+      { id: 3, date: '2024-04-06', type: 'Loss', amount: -200 },
+    ]
+  };
   // Fetch user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -44,16 +54,17 @@ const Navbar = () => {
     <>
       
 
-      <nav className="navbar navbar-expand-lg navbar-light bg-transparent shadow-sm py-2">
-        <div className="container d-flex justify-content-between">
+      <nav className="navbar navbar-expand-lg navbar-light bg-transparent shadow-sm ">
+        <div className="container d-flex justify-content-between  p-0">
           {/* Logo */}
           <Link to="/" className="navbar-brand">
-            <img src={logo} alt="MatchDada" width="100" />
+         {/*  <img src={logo} alt="MatchDada" width="100" height={'100'}/> */}
+         <h3 className="Logo-text">Match Dada</h3>
           </Link>
 
           {/* Navbar Toggle for Mobile */}
           <button
-            className="navbar-toggler"
+            className="navbar-toggler border"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarNav"
@@ -65,7 +76,7 @@ const Navbar = () => {
           </button>
 
           {/* Navbar Links */}
-          <div className="collapse navbar-collapse" id="navbarNav">
+          <div className="collapse navbar-collapse " id="navbarNav">
   <ul className="navbar-nav ms-auto me-"> {/* Add me-5 here */}
     <li className="nav-item mx-2">
       <Link to="/" className="nav-link text-dark">Home</Link>
@@ -117,6 +128,25 @@ const Navbar = () => {
                       </button>
                     </li>
                     <li>
+  <button 
+    className="dropdown-item text-dark fw-bold"
+    onClick={() => {
+      setShowAccountModal(false); // force-close first
+      setTimeout(() => setShowAccountModal(true), 10); // then open after short delay
+    }}
+  >
+    My Account 
+  </button>
+</li>
+{showAccountModal && (
+  <AccountSummaryModal
+    show={showAccountModal}
+    onClose={() => setShowAccountModal(false)}
+    stats={accountStats}
+  />
+)}
+
+                    <li>
                       <button className="dropdown-item text-dark fw-bold" onClick={() => setModalView("password")}>
                         Change Password
                       </button>
@@ -144,6 +174,7 @@ const Navbar = () => {
 
       {/* Create Match Modal */}
       <CreateMatchModal />
+      <AccountSummaryModal />
     </>
   );
 };

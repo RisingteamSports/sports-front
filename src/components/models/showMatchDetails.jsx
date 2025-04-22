@@ -35,6 +35,17 @@ const MatchDetailsPopup = ({ match }) => {
         requirements: {
             dress: "White sports attire",
             equipment: "Bring own gloves"
+        },
+        match_history: {
+            teamA: match.team_name || "Team A",
+            teamB: match.opponent_team || "Team B",
+            bid: match.match_bid || "0",
+            security: match.security_amount || "0",
+            overs: match.overs || "20",
+            venue: match.venue || "Not set",
+            scoreA: "145/6",
+            scoreB: "142/8",
+            winner: "Team A"
         }
     };
 
@@ -47,12 +58,13 @@ const MatchDetailsPopup = ({ match }) => {
 
     return (
         <>
-            <button 
+            <a 
+                href="#"
                 onClick={handleOpen} 
-                className="btn btn-link p-0 border-0 text-decoration-none text-muted small"
+                className="border-0 text-decoration-none small"
             >
                 Match Details
-            </button>
+            </a>
 
             {showModal && (
                 <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -128,7 +140,7 @@ const MatchDetailsPopup = ({ match }) => {
                                                 <div className="card-body">
                                                     <dl className="row mb-0">
                                                         <dt className="col-6">Overs:</dt>
-                                                        <dd className="col-6">20</dd>
+                                                        <dd className="col-6">{match.overs || "20"}</dd>
                                                         
                                                         <dt className="col-6">Ball Type:</dt>
                                                         <dd className="col-6">Leather</dd>
@@ -184,13 +196,55 @@ const MatchDetailsPopup = ({ match }) => {
                                         </div>
                                     </div>
 
+                                    {/* Match History Section */}
+                                    <div className="row g-4 mb-4">
+                                        <div className="col-12">
+                                            <div className="card">
+                                                <div className="card-header bg-light">
+                                                    <i className="fas fa-history me-2"></i>
+                                                    Match History
+                                                </div>
+                                                <div className="card-body">
+                                                    <dl className="row mb-0">
+                                                        <dt className="col-sm-4">Teams:</dt>
+                                                        <dd className="col-sm-8">
+                                                            {dummyData.match_history.teamA} <b>vs</b> {dummyData.match_history.teamB}
+                                                        </dd>
+
+                                                        <dt className="col-sm-4">Scores:</dt>
+                                                        <dd className="col-sm-8">
+                                                            {dummyData.match_history.teamA}: {dummyData.match_history.scoreA}, {dummyData.match_history.teamB}: {dummyData.match_history.scoreB}
+                                                        </dd>
+
+                                                        <dt className="col-sm-4">Bid:</dt>
+                                                        <dd className="col-sm-8">Rs. {dummyData.match_history.bid}</dd>
+
+                                                        <dt className="col-sm-4">Security:</dt>
+                                                        <dd className="col-sm-8">Rs. {dummyData.match_history.security}</dd>
+
+                                                        <dt className="col-sm-4">Overs:</dt>
+                                                        <dd className="col-sm-8">{dummyData.match_history.overs}</dd>
+
+                                                        <dt className="col-sm-4">Venue:</dt>
+                                                        <dd className="col-sm-8">{dummyData.match_history.venue}</dd>
+
+                                                        <dt className="col-sm-4">Winner:</dt>
+                                                        <dd className="col-sm-8">
+                                                            <span className="badge bg-success">{dummyData.match_history.winner}</span>
+                                                        </dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {/* Action Buttons */}
                                     <div className="d-flex justify-content-center gap-3 mt-4">
                                         <button className="btn btn-primary px-4">
-                                            <i className="fas fa-calendar-check me-2"></i>Join Match
+                                            <i className="fas fa-calendar-check me-2"></i>Request Match
                                         </button>
                                         <button className="btn btn-outline-secondary px-4">
-                                            <i className="fas fa-share me-2"></i>Share
+                                           Edit
                                         </button>
                                     </div>
                                 </div>

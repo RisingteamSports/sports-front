@@ -7,6 +7,7 @@ const CreateMatchModal = () => {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
+  const [checkingTeamName, setCheckingTeamName] = useState(false);
 
   const [formData, setFormData] = useState({
     teamName: '',
@@ -223,7 +224,31 @@ const CreateMatchModal = () => {
     const updatedRules = formData.rules.filter((_, i) => i !== index);
     setFormData(prev => ({ ...prev, rules: updatedRules }));
   };
-
+  const checkTeamNameExists = async (teamName) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const user = JSON.parse(localStorage.getItem("user"));
+  
+      if (!token) throw new Error('Authentication required');
+      if (!user?.id) throw new Error('User information missing');
+  
+      const response = await axios.get(`${API_URL}/check-team`, {
+        params: { name: teamName },
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      return response.data.exists;
+    } catch (err) {
+      console.error('Error checking team name:', err);
+      return false;
+    }
+  };
+  
+  
+  
   return (
     <div className="modal fade" id="createMatchModal" tabIndex="-1">
       <div className="modal-dialog modal-xl">
@@ -254,12 +279,36 @@ const CreateMatchModal = () => {
                     <div className="form-group">
                       <label className="form-label">Team Name <span className="text-danger">*</span></label>
                       <input
-                        type="text"
-                        className={`form-control form-control-lg ${errors.teamName ? 'is-invalid' : ''}`}
-                        value={formData.teamName}
-                        onChange={e => setFormData(prev => ({ ...prev, teamName: e.target.value }))}
-                      />
-                      {errors.teamName && <div className="invalid-feedback">{errors.teamName}</div>}
+          type="text"
+          className={`form-control form-control-lg ${errors.teamName ? 'is-invalid' : ''}`}
+          value={formData.teamName}
+          onChange={async (e) => {
+            const value = e.target.value;
+            setFormData(prev => ({ ...prev, teamName: value }));
+
+            if (value.trim() === '') {
+              setErrors(prev => ({ ...prev, teamName: 'Team name is required' }));
+              return;
+            }
+
+            setCheckingTeamName(true);
+            const exists = await checkTeamNameExists(value);
+            setCheckingTeamName(false);
+
+            setErrors(prev => ({
+              ...prev,
+              teamName: exists ? 'Team name already exists' : ''
+            }));
+          }}
+        />
+         {checkingTeamName && (
+          <div className="form-text text-primary small mt-1">
+            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            Checking team name...
+          </div>
+        )}
+{errors.teamName && <div className="invalid-feedback">{errors.teamName}</div>}
+
                     </div>
                   </div>
 

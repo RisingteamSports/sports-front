@@ -29,12 +29,13 @@ body.light-theme {
    
   }
 
-
-
+.Logo-text{
+  color: var(--neon-yellow);
+}
 /* horizental nav */
 .navbar{
     border-bottom: 3px groove var(--neon-yellow);
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     color: var(--neon-yellow);
 }
 .navbar-nav {

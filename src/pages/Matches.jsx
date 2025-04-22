@@ -17,11 +17,12 @@ const AllMatches = () => {
     venue: "",
     date: "",
   });
-
+console.log(currentUser);
   const API_URL = "https://matc.matchdada.com/public/api";
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
@@ -159,8 +160,8 @@ const AllMatches = () => {
         <div className="row">
           <div className="col-12 m-0">
             {/* Search and Filter Section */}
-            <div className="card mb-2 p-1">
-              <div className="row">
+            <div className="p-0">
+              <div className="row px-2">
                 <div className="col-md-12">
                   <div className="input-group">
                     <input
@@ -180,58 +181,6 @@ const AllMatches = () => {
                 </div>
               </div>
               
-              <div className="row">
-                <div className="col-md-3 mb-2">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search by category..."
-                    name="category"
-                    value={searchFilters.category}
-                    onChange={handleFilterChange}
-                  />
-                </div>
-                
-                <div className="col-md-3 mb-2">
-                  <select
-                    className="form-select"
-                    name="status"
-                    value={searchFilters.status}
-                    onChange={handleFilterChange}
-                  >
-                    <option value="">All Statuses</option>
-                    {statuses.map((status, index) => (
-                      <option key={index} value={status}>
-                        {status === "available" ? "Available" :
-                         status === "booked" ? "Booked" :
-                         status === "live" ? "Live" :
-                         status === "pending" ? "Pending" : status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="col-md-3 mb-2">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search by venue..."
-                    name="venue"
-                    value={searchFilters.venue}
-                    onChange={handleFilterChange}
-                  />
-                </div>
-                
-                <div className="col-md-3 mb-2">
-                  <input
-                    type="date"
-                    className="form-control"
-                    name="date"
-                    value={searchFilters.date}
-                    onChange={handleFilterChange}
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Matches List */}
@@ -251,15 +200,30 @@ const AllMatches = () => {
                     <div className="row p-2 cards-container">
                       {filteredMatches.length > 0 ? (
                         filteredMatches.map((match) => (
-                          <div key={match.id} className="col-lg-4 col-md-6 col-12 mb-3">
+                          <div key={match.id} className="col-lg-4 col-md-6 col-12 mb-3 p-1">
                             <div className="card bg-white text-black p-2 text-center shadow-sm h-100">
-                              <div className="d-flex justify-content-between align-items-center mb-1">
-                                <div className="d-flex align-items-center">
-                                  <i className="fas fa-baseball-bat-ball fa-1x text-warning me-1"></i>
-                                  <p className="mb-0 fw-bold">{match.user.username}</p>
-                                </div>
-                                <p className="text-muted small mb-0">{match.category}</p>
-                              </div>
+                            <div className="d-flex justify-content-between align-items-center mb-1">
+  <div className="d-flex align-items-center">
+    {match.team_logo ? (
+      <img 
+        src={match.team_logo} 
+        alt="Team Logo" 
+        className="rounded-circle me-2" 
+        style={{ width: "35px", height: "35px", objectFit: "cover", border: "1px solid #ccc" }}
+      />
+    ) : (
+      <div 
+        className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" 
+        style={{ width: "35px", height: "35px", border: "1px solid #ccc" }}
+      >
+        <i className="fas fa-user text-secondary"></i>
+      </div>
+    )}
+    <h5 className="mb-0 fw-bold">{match.team_name}</h5>
+  </div>
+  <p className="text-muted small mb-0">{match.category}</p>
+</div>
+
 
                               <div className="row align-items-center">
                                 <div className="col-4 text-center">
@@ -281,14 +245,14 @@ const AllMatches = () => {
                                           "Pending"}
                                   </span>
                                 </div>
-                                <div className="col-4 text-center d-flex align-items-center justify-content-around">
-                                  <p className="mb-0 text-danger fw-bold">
+                                <div className="col-4 text-center d-flex flex-column align-items-center justify-content-center mt-3">
+                                  <p className="mb-0 text-danger fw-bold d-flex align-items-center ">
                                     Bid <br />
-                                    <span className="text-muted small">${match.match_bid}</span>
+                                    <span className="text-muted small mx-1">{match.match_bid}</span>
                                   </p>
-                                  <p className="mb-0 text-danger fw-bold">
+                                  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
                                     Security <br />
-                                    <span className="text-muted small">{match.security === "1" ? `${match.security_amount ?? "0"}` : "No"}</span>
+                                    <span className="text-muted small mx-1">{match.security === "1" ? `${match.security_amount ?? "0"}` : "No"}</span>
                                   </p>
                                 </div>
 
