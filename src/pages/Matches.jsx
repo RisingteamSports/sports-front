@@ -235,10 +235,10 @@ console.log(currentUser);
                                 </div>
                                 <div className="col-4 text-right">
                                   <span className={`badge small ${
-                                    match.match_status === "available" ? "bg-success text-black" :
-                                      match.match_status === "booked" ? "bg-danger text-black" :
-                                        match.match_status === "live" ? "bg-danger text-black" :
-                                          "bg-warning text-black"}`}>
+                                    match.match_status === "available" ? "bg-success text-white" :
+                                      match.match_status === "booked" ? "bg-danger text-white" :
+                                        match.match_status === "live" ? "bg-danger text-white" :
+                                          "bg-warning text-white"}`}>
                                     {match.match_status === "available" ? "Available" :
                                       match.match_status === "booked" ? "Booked" :
                                         match.match_status === "live" ? "Live" :
@@ -268,7 +268,7 @@ console.log(currentUser);
                                 {match.match_status === "available" && (
                                   <a
                                     href="#"
-                                    className="btn btn-request w-100 text-decoration-none"
+                                    className="btn btn-request w-100  text-decoration-none"
                                     onClick={() => handleClick(true, match.id, match.user_id)}
                                   >
                                     Request

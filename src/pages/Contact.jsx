@@ -56,92 +56,97 @@ const ContactUs = () => {
 
   return (
     <div className="container-fluid">
-      <Navbar />
-      <section className="contact_us">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-10 offset-md-1">
-              <div className="contact_inner">
-                <div className="row">
-                  <div className="col-md-10">
-                    <div className="contact_form_inner">
-                      <div className="contact_field">
-                        <h3>Contact Us</h3>
-                        <p>Feel free to contact us any time. We will get back to you as soon as we can!</p>
+  <Navbar />
+  <section className="contact_us py-5">
+    <div className="container-fluid px-md-5"> {/* wider container */}
+      <div className="row justify-content-center">
+        <div className="col-md-10"> {/* changed from col-md-10 */}
+          <div className="contact_inner">
+            <div className="row">
 
-                        <input
-                          type="text"
-                          name="name"
-                          className="form-control form-group"
-                          placeholder="Name"
-                          value={formData.name}
-                          onChange={handleChange}
-                        />
+              {/* Contact Form */}
+              <div className="col-md-6">
+                <div className="contact_form_inner h-100">
+                  <div className="contact_field">
+                    <h3>Contact Us</h3>
+                    <p>Feel free to contact us any time. We will get back to you as soon as we can!</p>
 
-                        <input
-                          type="email"
-                          name="email"
-                          className="form-control form-group"
-                          placeholder="Email"
-                          value={formData.email}
-                          onChange={handleChange}
-                        />
+                    <input
+                      type="text"
+                      name="name"
+                      className="form-control form-group"
+                      placeholder="Name"
+                      value={formData.name}
+                      onChange={handleChange}
+                    />
 
-                        <input
-                          type="tel"
-                          name="phone"
-                          className="form-control form-group"
-                          placeholder="Phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                        />
+                    <input
+                      type="email"
+                      name="email"
+                      className="form-control form-group"
+                      placeholder="Email"
+                      value={formData.email}
+                      onChange={handleChange}
+                    />
 
-                        <textarea
-                          name="message"
-                          className="form-control form-group"
-                          placeholder="Message"
-                          value={formData.message}
-                          onChange={handleChange}
-                        ></textarea>
+                    <input
+                      type="tel"
+                      name="phone"
+                      className="form-control form-group"
+                      placeholder="Phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
 
-                        <button className="btn mt-2 h-button" onClick={handleContact}>Send</button>
-                      </div>
-                    </div>
-                  </div>
+                    <textarea
+                      name="message"
+                      className="form-control form-group"
+                      placeholder="Message"
+                      value={formData.message}
+                      onChange={handleChange}
+                    ></textarea>
 
-                  <div className="col-md-2">
-                    <div className="right_conatct_social_icon d-flex align-items-end">
-                      <div className="socil_item_inner d-flex">
-                        <li><a href="#"><i className="fab fa-facebook-square"></i></a></li>
-                        <li><a href="#"><i className="fab fa-instagram"></i></a></li>
-                        <li><a href="#"><i className="fab fa-twitter"></i></a></li>
-                      </div>
-                    </div>
+                    <button className="btn mt-2 h-button" onClick={handleContact}>Send</button>
                   </div>
                 </div>
-
-                <div className="contact_info_sec">
-                  <h4>Contact Info</h4>
-                  <div className="d-flex info_single align-items-center fs-5 ">
-                    <i className="fas fa-headset"></i>
-                    <span class=" fs-5" >+91 8009 054294</span>
-                  </div>
-                  <div className="d-flex info_single align-items-center fs-5">
-                    <i className="fas fa-envelope-open-text"></i>
-                    <span className="fs-5">info@flightmantra.com</span>
-                  </div>
-                  <div className="d-flex info_single align-items-center fs-5">
-                    <i className="fas fa-map-marked-alt"></i>
-                    <span className="fs-5">1000+ Travel partners and 65+ Service city across India, USA, Canada & UAE</span>
-                  </div>
-                </div>
-
               </div>
+
+              {/* Contact Info */}
+              <div className="col-md-6">
+                <div className="contact_info_sec p-3 bg-dark rounded shadow h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <h4>Contact Info</h4>
+                    <div className="d-flex info_single align-items-center fs-5 mb-3">
+                      <i className="fas fa-headset me-2"></i>
+                      <span >+91 8009 054294</span>
+                    </div>
+                    <div className="d-flex info_single align-items-center fs-5 mb-3">
+                      <i className="fas fa-envelope-open-text me-2"></i>
+                      <span>info@flightmantra.com</span>
+                    </div>
+                    <div className="d-flex info_single align-items-start fs-5 mb-3">
+                      <i className="fas fa-map-marked-alt me-2"></i>
+                      <span>1000+ Travel partners and 65+ Service city across India, USA, Canada & UAE</span>
+                    </div>
+                  </div>
+
+                  {/* Social Icons */}
+                  {/* <div className="d-flex gap-3 fs-4 mt-4">
+                    <a href="#"><i className="fab fa-facebook-square"></i></a>
+                    <a href="#"><i className="fab fa-instagram"></i></a>
+                    <a href="#"><i className="fab fa-twitter"></i></a>
+                  </div> */}
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
+  </section>
+</div>
+
   );
 };
 

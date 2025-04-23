@@ -259,6 +259,40 @@ const CreateMatchModal = () => {
           </div>
 
           <div className="modal-body">
+
+          <div className="row mb-4 text-center">
+  <div className="col-md-4">
+    <div className="p-3 bg-light rounded shadow">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+        alt="Silver Crown"
+        style={{ height: '50px' }}
+      />
+      <h6 className="mt-2">Silver Crown</h6>
+    </div>
+  </div>
+  <div className="col-md-4">
+    <div className="p-3 bg-warning rounded shadow">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+        alt="Gold Crown"
+        style={{ height: '50px' }}
+      />
+      <h6 className="mt-2">Gold Crown</h6>
+    </div>
+  </div>
+  <div className="col-md-4">
+    <div className="p-3 bg-info rounded shadow">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+        alt="Diamond Crown"
+        style={{ height: '50px' }}
+      />
+      <h6 className="mt-2">Diamond Crown</h6>
+    </div>
+  </div>
+</div>
+
             {/* Stepper */}
             <div className="stepper-wrapper mb-5">
               {[1, 2, 3].map((step) => (
@@ -322,6 +356,29 @@ const CreateMatchModal = () => {
                         onChange={e => setFormData(prev => ({ ...prev, captainName: e.target.value }))}
                       />
                       {errors.captainName && <div className="invalid-feedback">{errors.captainName}</div>}
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">Age <span className="text-danger">*</span></label>
+                      <input
+                        type="number"
+                        className={`form-control form-control-lg ${errors.captainName ? 'is-invalid' : ''}`}
+                        
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <label className="form-label">Contact Number <span className="text-danger">*</span></label>
+                      <input
+                        type="number"
+                        className={`form-control form-control-lg ${errors.captainName ? 'is-invalid' : ''}`}
+                        
+                      />
+                     
                     </div>
                   </div>
 
@@ -486,7 +543,7 @@ const CreateMatchModal = () => {
                   <div className="col-md-4">
                     <div className="form-group">
                       <label className="form-label">Security Deposit</label>
-                      <div className="input-group">
+                      <div className="">
                         <select
                           className="form-select"
                           value={formData.security}
@@ -496,6 +553,8 @@ const CreateMatchModal = () => {
                           <option value="yes">Yes</option>
                         </select>
                         {formData.security === 'yes' && (
+                          <div className="form-group mt-2">
+      <label className="form-label"> Amount</label>
                           <input
                             type="number"
                             className={`form-control ${errors.securityAmount ? 'is-invalid' : ''}`}
@@ -503,6 +562,7 @@ const CreateMatchModal = () => {
                             value={formData.securityAmount}
                             onChange={e => setFormData(prev => ({ ...prev, securityAmount: e.target.value }))}
                           />
+                          </div>
                         )}
                       </div>
                       {errors.securityAmount && <div className="invalid-feedback">{errors.securityAmount}</div>}
@@ -510,20 +570,37 @@ const CreateMatchModal = () => {
                   </div>
 
                   <div className="col-md-4">
-                    <div className="form-group">
-                      <label className="form-label">Match Bid</label>
-                      <select
-                        className="form-select"
-                        value={formData.matchBid}
-                        onChange={e => setFormData(prev => ({ ...prev, matchBid: e.target.value }))}
-                      >
-                        <option value="no">No</option>
-                        <option value="yes">Yes</option>
-                        <option value="100">100</option>
-                        <option value="200">200</option>
-                      </select>
-                    </div>
-                  </div>
+  <div className="form-group">
+    <label className="form-label">Match Bid</label>
+    <select
+      className="form-select"
+      value={formData.matchBid}
+      onChange={e =>
+        setFormData(prev => ({ ...prev, matchBid: e.target.value }))
+      }
+    >
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+    </select>
+  </div>
+
+  {/* Show custom input only if 'yes' is selected */}
+  {formData.matchBid === "yes" && (
+    <div className="form-group mt-2">
+      <label className="form-label"> Amount</label>
+      <input
+        type="number"
+        className="form-control"
+        placeholder="Enter custom amount"
+        value={formData.customBid || ""}
+        onChange={e =>
+          setFormData(prev => ({ ...prev, customBid: e.target.value }))
+        }
+      />
+    </div>
+  )}
+</div>
+
 
                   <div className="col-md-4">
                     <div className="form-group">

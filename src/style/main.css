@@ -85,7 +85,7 @@ body.light-theme {
     background-color: #FFE600;
 }
 .btn{
-   background-color: #003400; 
+  background-color: var(--neon-yellow) !important; 
    color: white;
 }
 .btn-load-more{
