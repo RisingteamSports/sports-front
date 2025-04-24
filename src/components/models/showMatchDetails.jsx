@@ -3,6 +3,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const MatchDetailsPopup = ({ match }) => {
     const [showModal, setShowModal] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
+const [showFullHistory, setShowFullHistory] = useState(false);
+
 
     // Enhanced dummy data structure
     const dummyData = {
@@ -196,57 +199,93 @@ const MatchDetailsPopup = ({ match }) => {
                                         </div>
                                     </div>
 
-                                    {/* Match History Section */}
-                                    <div className="row g-4 mb-4">
-                                        <div className="col-12">
-                                            <div className="card">
-                                                <div className="card-header bg-light">
-                                                    <i className="fas fa-history me-2"></i>
-                                                    Match History
-                                                </div>
-                                                <div className="card-body">
-                                                    <dl className="row mb-0">
-                                                        <dt className="col-sm-4">Teams:</dt>
-                                                        <dd className="col-sm-8">
-                                                            {dummyData.match_history.teamA} <b>vs</b> {dummyData.match_history.teamB}
-                                                        </dd>
+                                   {/* Match History Section */}
+{showFullHistory && (
+    <div className="row g-4 mb-4 mt-2">
+        <div className="col-12">
+            <div className="card">
+                <div className="card-header bg-light">
+                    <i className="fas fa-history me-2"></i>
+                    Match History
+                </div>
+                <div className="card-body">
+                    <dl className="row mb-0">
+                        <dt className="col-sm-4">Teams:</dt>
+                        <dd className="col-sm-8">
+                            {dummyData.match_history.teamA} <b>vs</b> {dummyData.match_history.teamB}
+                        </dd>
+                        <dt className="col-sm-4">Scores:</dt>
+                        <dd className="col-sm-8">
+                            {dummyData.match_history.teamA}: {dummyData.match_history.scoreA}, {dummyData.match_history.teamB}: {dummyData.match_history.scoreB}
+                        </dd>
+                        <dt className="col-sm-4">Bid:</dt>
+                        <dd className="col-sm-8">Rs. {dummyData.match_history.bid}</dd>
+                        <dt className="col-sm-4">Security:</dt>
+                        <dd className="col-sm-8">Rs. {dummyData.match_history.security}</dd>
+                        <dt className="col-sm-4">Overs:</dt>
+                        <dd className="col-sm-8">{dummyData.match_history.overs}</dd>
+                        <dt className="col-sm-4">Venue:</dt>
+                        <dd className="col-sm-8">{dummyData.match_history.venue}</dd>
+                        <dt className="col-sm-4">Winner:</dt>
+                        <dd className="col-sm-8">
+                            <span className="badge bg-success">{dummyData.match_history.winner}</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+)}
 
-                                                        <dt className="col-sm-4">Scores:</dt>
-                                                        <dd className="col-sm-8">
-                                                            {dummyData.match_history.teamA}: {dummyData.match_history.scoreA}, {dummyData.match_history.teamB}: {dummyData.match_history.scoreB}
-                                                        </dd>
+{/* Mini History Cards */}
+{showHistory && !showFullHistory && (
+    <div className="row g-3 mt-4">
+        {[1, 2, 3].map((_, idx) => (
+            <div className="col-12" key={idx}>
+                <div className="card shadow-sm">
+                    <div className="card-body">
+                        <div className="d-flex justify-content-between">
+                            <div>
+                                <h6 className="mb-1">{dummyData.match_history.teamA} <b>vs</b> {dummyData.match_history.teamB}</h6>
+                                <small className="text-muted">
+                                    Date: {new Date().toLocaleDateString()}
+                                </small>
+                            </div>
+                            <div className="text-end">
+                                <span className={`badge ${idx % 2 === 0 ? 'bg-success' : 'bg-danger'}`}>
+                                    {idx % 2 === 0 ? "Win" : "Loss"}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="text-end mt-2">
+                            <button className="btn btn-sm btn-outline-primary" onClick={() => setShowFullHistory(true)}>
+                                Show More
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+)}
 
-                                                        <dt className="col-sm-4">Bid:</dt>
-                                                        <dd className="col-sm-8">Rs. {dummyData.match_history.bid}</dd>
+                                  {/* Action Buttons */}
+<div className="d-flex justify-content-center gap-3 mt-4">
+    <button className="btn btn-primary px-4">
+        <i className="fas fa-calendar-check me-2"></i>Request Match
+    </button>
+    <button className="btn btn-outline-secondary px-4">
+        Edit
+    </button>
+    <button
+        className="btn btn-outline-secondary px-4"
+        onClick={() => setShowHistory(!showHistory)}
+    >
+        {showHistory ? "Hide History" : "Show History"}
+    </button>
+</div>
 
-                                                        <dt className="col-sm-4">Security:</dt>
-                                                        <dd className="col-sm-8">Rs. {dummyData.match_history.security}</dd>
 
-                                                        <dt className="col-sm-4">Overs:</dt>
-                                                        <dd className="col-sm-8">{dummyData.match_history.overs}</dd>
-
-                                                        <dt className="col-sm-4">Venue:</dt>
-                                                        <dd className="col-sm-8">{dummyData.match_history.venue}</dd>
-
-                                                        <dt className="col-sm-4">Winner:</dt>
-                                                        <dd className="col-sm-8">
-                                                            <span className="badge bg-success">{dummyData.match_history.winner}</span>
-                                                        </dd>
-                                                    </dl>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="d-flex justify-content-center gap-3 mt-4">
-                                        <button className="btn btn-primary px-4">
-                                            <i className="fas fa-calendar-check me-2"></i>Request Match
-                                        </button>
-                                        <button className="btn btn-outline-secondary px-4">
-                                           Edit
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -131,23 +131,8 @@ const Navbar = () => {
                       </button>
                     </li>
                     <li>
-  <button 
-    className="dropdown-item text-dark fw-bold"
-    onClick={() => {
-      setShowAccountModal(false); // force-close first
-      setTimeout(() => setShowAccountModal(true), 10); // then open after short delay
-    }}
-  >
-    My Account 
-  </button>
-</li>
-{showAccountModal && (
-  <AccountSummaryModal
-    show={showAccountModal}
-    onClose={() => setShowAccountModal(false)}
-    stats={accountStats}
-  />
-)}
+                    <AccountSummaryModal />
+                    </li>
 
                     <li>
                       <button className="dropdown-item text-dark fw-bold" onClick={() => setModalView("password")}>
@@ -177,7 +162,6 @@ const Navbar = () => {
 
       {/* Create Match Modal */}
       <CreateMatchModal />
-      <AccountSummaryModal />
     </>
   );
 };
