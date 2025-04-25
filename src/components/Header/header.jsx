@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import ProfileUpdateModal from "../Edit_profile";
 import CreateMatchModal from "../models/createNewMatch";
-import logo from "../../assets/images/logo512.png";
 import Notifications from "../models/NotificationPop";
-import AccountSummaryModal from '../models/showalanceDetails';
+import AccountSummaryModal from "../models/showalanceDetails"
+
 const Navbar = () => {
   const navigate = useNavigate();
   const [modalView, setModalView] = useState(null);
@@ -12,7 +13,7 @@ const Navbar = () => {
   const [profile, setProfile] = useState(
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM8LrGjiUDcvYjUMk7jUJJZo0kK4Y4NzKxmQ&s"
   );
-  const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false); // Account summary modal state
   const accountStats = {
     matchesWon: 12,
     matchesLost: 5,
@@ -23,6 +24,7 @@ const Navbar = () => {
       { id: 3, date: '2024-04-06', type: 'Loss', amount: -200 },
     ]
   };
+
   // Fetch user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -50,16 +52,18 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const handleAccountClick = (e) => {
+    e.preventDefault();
+    setShowAccountModal(true); // Open the account modal
+  };
+
   return (
     <>
-      
-
-      <nav className="navbar navbar-expand-lg navbar-light bg-transparent shadow-sm ">
-        <div className="container d-flex justify-content-between  p-0">
+      <nav className="navbar navbar-expand-lg navbar-light bg-transparent shadow-sm">
+        <div className="container d-flex justify-content-between p-0">
           {/* Logo */}
           <Link to="/" className="navbar-brand">
-         {/*  <img src={logo} alt="MatchDada" width="100" height={'100'}/> */}
-         <h3 className="Logo-text">Match Dada</h3>
+            <h3 className="Logo-text">Match Dada</h3>
           </Link>
 
           {/* Navbar Toggle for Mobile */}
@@ -76,53 +80,60 @@ const Navbar = () => {
           </button>
 
           {/* Navbar Links */}
-          <div className="collapse navbar-collapse " id="navbarNav">
-  <ul className="navbar-nav ms-auto me-"> {/* Add me-5 here */}
-    <li className="nav-item mx-2">
-      <Link to="/" className="nav-link text-dark">Home</Link>
-    </li>
-    <li className="nav-item mx-2">
-      <Link to="/all-teams" className="nav-link text-dark">All Teams</Link>
-    </li>
-    <li className="nav-item mx-2">
-      <Link to="/all-teams" className="nav-link text-dark">Shop</Link>
-    </li>
-    <li className="nav-item mx-2">
-      <Link to="" className="nav-link text-dark" data-bs-toggle={user ? "modal" : ""} data-bs-target={user ? "#createMatchModal" : ""} onClick={(e) => { if (!user) {  e.preventDefault(); navigate("/login");   }
-        }}>  Match </Link>
-    </li>
-    <li className="nav-item mx-2">
-      <Link to="/contact-us" className="nav-link text-dark">Contact Us</Link>
-    </li>
-  </ul>
-</div>
-
+          <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav ms-auto">
+              <li className="nav-item mx-2">
+                <Link to="/" className="nav-link text-dark">Home</Link>
+              </li>
+              <li className="nav-item mx-2">
+                <Link to="/all-teams" className="nav-link text-dark">All Teams</Link>
+              </li>
+              <li className="nav-item mx-2">
+                <Link to="/all-teams" className="nav-link text-dark">Shop</Link>
+              </li>
+              <li className="nav-item mx-2">
+                <Link to="" className="nav-link text-dark" data-bs-toggle={user ? "modal" : ""} data-bs-target={user ? "#createMatchModal" : ""} onClick={(e) => { if (!user) { e.preventDefault(); navigate("/login"); }}}>  Match </Link>
+              </li>
+              <li className="nav-item mx-2">
+                <Link to="/contact-us" className="nav-link text-dark">Contact Us</Link>
+              </li>
+            </ul>
+          </div>
 
           {/* Profile & Notifications */}
           <div className="d-flex align-items-center">
             {user ? (
               <>
-                {/* Notifications */}
-                <div className="me-3">
+                {/* Notifications and Chat Icon */}
+                <div className="me-3 d-flex align-items-center">
                   <Notifications />
+
+                  {/* Chat Icon */}
+                  <button
+                    className="border-0 text-center text-decoration-none text-white icon-link position-relative ms-3 mb-2"
+                    onClick={() => navigate("/chat")}
+                    title="Chat"
+                  >
+                    <i className="bi bi-chat-dots-fill fs-5"></i>
+                  </button>
                 </div>
 
                 {/* Profile Dropdown */}
                 <div className="dropdown">
-                <button
-  className="text-dark fw-bold dropdown-toggle p-0 border-0 bg-transparent"
-  id="userDropdown"
-  data-bs-toggle="dropdown"
->
-  <img
-    src={profile}
-    className="rounded-circle border border-secondary me-2"
-    alt="User Avatar"
-    width="35"
-    height="35"
-    style={{ objectFit: "cover" }}
-  />
-</button>
+                  <button
+                    className="text-dark fw-bold dropdown-toggle p-0 border-0 bg-transparent"
+                    id="userDropdown"
+                    data-bs-toggle="dropdown"
+                  >
+                    <img
+                      src={profile}
+                      className="rounded-circle border border-secondary me-2"
+                      alt="User Avatar"
+                      width="35"
+                      height="35"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </button>
 
                   <ul className="dropdown-menu dropdown-menu-end bg-light border border-secondary">
                     <li>
@@ -131,9 +142,10 @@ const Navbar = () => {
                       </button>
                     </li>
                     <li>
-                    <AccountSummaryModal />
+                      <button className="dropdown-item text-dark fw-bold" onClick={handleAccountClick}>
+                        My Account
+                      </button>
                     </li>
-
                     <li>
                       <button className="dropdown-item text-dark fw-bold" onClick={() => setModalView("password")}>
                         Change Password
@@ -162,6 +174,13 @@ const Navbar = () => {
 
       {/* Create Match Modal */}
       <CreateMatchModal />
+
+      {/* Account Summary Modal */}
+      <AccountSummaryModal
+        show={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+        accountStats={accountStats}
+      />
     </>
   );
 };
