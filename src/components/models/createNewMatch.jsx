@@ -249,7 +249,7 @@ const CreateMatchModal = () => {
     }
   };
   
-  
+  const [selectedCard, setSelectedCard] = useState("silver");
   
   return (
     <div className="modal fade" id="createMatchModal" tabIndex="-1">
@@ -263,37 +263,50 @@ const CreateMatchModal = () => {
           <div className="modal-body">
 
           <div className="row mb-4 text-center">
-  <div className="col-md-4">
-    <div className="p-3 bg-light rounded shadow">
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-        alt="Silver Crown"
-        style={{ height: '50px' }}
-      />
-      <h6 className="mt-2">Silver Crown</h6>
+      <div className="col-md-4">
+        <div
+          className={`p-3 rounded shadow ${selectedCard === "silver" ? "bg-primary" : "bg-warning"}`}
+          style={{ cursor: 'pointer' }}
+          onClick={() => setSelectedCard("silver")}
+        >
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+            alt="Silver Crown"
+            style={{ height: '50px' }}
+          />
+          <h6 className="mt-2">Silver</h6>
+        </div>
+      </div>
+      <div className="col-md-4">
+        <div
+          className={`p-3 rounded shadow ${selectedCard === "gold" ? "bg-primary" : "bg-warning"}`}
+          style={{ cursor: 'pointer' }}
+          onClick={() => setSelectedCard("gold")}
+        >
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+            alt="Gold Crown"
+            style={{ height: '50px' }}
+          />
+          <h6 className="mt-2">Gold</h6>
+        </div>
+      </div>
+      <div className="col-md-4">
+        <div
+          className={`p-3 rounded shadow ${selectedCard === "diamond" ? "bg-primary" : "bg-warning"}`}
+          style={{ cursor: 'pointer' }}
+          onClick={() => setSelectedCard("diamond")}
+        >
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+            alt="Diamond Crown"
+            style={{ height: '50px' }}
+          />
+          <h6 className="mt-2">Diamond</h6>
+        </div>
+      </div>
     </div>
-  </div>
-  <div className="col-md-4">
-    <div className="p-3 bg-warning rounded shadow">
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-        alt="Gold Crown"
-        style={{ height: '50px' }}
-      />
-      <h6 className="mt-2">Gold Crown</h6>
-    </div>
-  </div>
-  <div className="col-md-4">
-    <div className="p-3 bg-info rounded shadow">
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-        alt="Diamond Crown"
-        style={{ height: '50px' }}
-      />
-      <h6 className="mt-2">Diamond Crown</h6>
-    </div>
-  </div>
-</div>
+
 
             {/* Stepper */}
             <div className="stepper-wrapper mb-5">
