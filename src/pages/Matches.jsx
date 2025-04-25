@@ -17,7 +17,6 @@ const AllMatches = () => {
     venue: "",
     date: "",
   });
-console.log(currentUser);
   const API_URL = "https://matc.matchdada.com/public/api";
 
   useEffect(() => {
@@ -200,7 +199,7 @@ console.log(currentUser);
                     <div className="row p-2 cards-container">
                       {filteredMatches.length > 0 ? (
                         filteredMatches.map((match) => (
-                          <div key={match.id} className="col-lg-4 col-md-6 col-12 mb-3 p-1">
+                          <div key={match.id} className="col-lg-5 col-md-6 col-12 mb-3 p-1">
                             <div className="card bg-white text-black p-2 text-center shadow-sm h-100">
                             <div className="d-flex justify-content-between align-items-center mb-1">
   <div className="d-flex align-items-center">
@@ -229,7 +228,12 @@ console.log(currentUser);
                                 <div className="col-4 text-center">
                                   <p className="mb-0 text-danger fw-bold">
                                     <span className="text-muted small">
-                                      <MatchDetailsPopup match={match} />
+                                    <MatchDetailsPopup
+  match={match}
+  currentUser={currentUser}
+  onRequestClick={() => handleClick(true, match.id, match.user_id)}
+/>
+
                                     </span>
                                   </p>
                                 </div>
@@ -246,15 +250,24 @@ console.log(currentUser);
                                   </span>
                                 </div>
                                 <div className="col-4 text-center d-flex flex-column align-items-center justify-content-center mt-3">
-                                  <p className="mb-0 text-danger fw-bold d-flex align-items-center ">
-                                    Bid <br />
-                                    <span className="text-muted small mx-1">{match.match_bid}</span>
-                                  </p>
-                                  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
-                                    Security <br />
-                                    <span className="text-muted small mx-1">{match.security === "1" ? `${match.security_amount ?? "0"}` : "No"}</span>
-                                  </p>
-                                </div>
+  {/* Match Bid */}
+  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
+    Bid <br />
+    <span className="text-muted small mx-1">
+      {match.match_bid === "yes" ? `Rs. ${match.custom_bid ?? "0"}` : "No"}
+    </span>
+  </p>
+
+  {/* Security */}
+  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
+    Security <br />
+    <span className="text-muted small mx-1">
+    {match.security == 1 ? `Rs. ${match.security_amount ?? "0"}` : "No"}
+
+    </span>
+  </p>
+</div>
+
 
                                 <div className="col-12 text-center">
                                   <p className="mb-0 text-danger fw-bold d-flex justify-content-center">

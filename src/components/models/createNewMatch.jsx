@@ -17,6 +17,7 @@ const CreateMatchModal = () => {
     security: 'no',
     securityAmount: '',
     matchBid: 'no',
+    customBid: '',
     matchDatetime: '',
     ballType: 'tape',
     venue: '',
@@ -142,7 +143,8 @@ const CreateMatchModal = () => {
         category: formData.category,
         security: formData.security,
         security_amount: formData.security === 'yes' ? formData.securityAmount : null,  // Changed from securityAmount
-        match_bid: formData.matchBid,  // Changed from matchBid
+        match_bid: formData.matchBid, 
+        custom_bid: formData.matchBid === 'yes' ? formData.customBid : null, // Changed from matchBid
         match_datetime: new Date(formData.matchDatetime).toISOString(),  // Changed from matchDatetime
         ball_type: formData.ballType,  // Changed from ballType
         venue: formData.venue,
