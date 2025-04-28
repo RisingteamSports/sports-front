@@ -8,9 +8,11 @@ const CreateMatchModal = () => {
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
   const [checkingTeamName, setCheckingTeamName] = useState(false);
+  const [selectedCard, setSelectedCard] = useState("silver");
 
   const [formData, setFormData] = useState({
     teamName: '',
+    teamLogo: null,
     captainName: '',
     players: [{ name: '', role: 'Batsman', image: null }],
     category: '',
@@ -48,7 +50,6 @@ const CreateMatchModal = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const API_URL = "https://matc.matchdada.com/public/api";
 
-  // Get cities based on selected province
   const getCitiesByProvince = (province) => {
     const citiesMap = {
       Punjab: ['Lahore', 'Faisalabad', 'Rawalpindi', 'Multan'],
@@ -68,7 +69,6 @@ const CreateMatchModal = () => {
     }
   }, [formData.province]);
 
-  // Validation logic
   const validateStep = (step) => {
     const newErrors = {};
     if (step === 1) {
@@ -108,6 +108,14 @@ const CreateMatchModal = () => {
     }
   };
 
+  const handleTeamLogoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const base64 = await convertToBase64(file);
+      setFormData(prev => ({ ...prev, teamLogo: base64 }));
+    }
+  };
+
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -130,10 +138,10 @@ const CreateMatchModal = () => {
       if (!token) throw new Error('Authentication required');
       if (!user?.id) throw new Error('User information missing');
   
-      // Prepare the payload with correct field names expected by the API
       const payload = {
-        user_id: user.id,  // Changed from userId to user_id
-        team_name: formData.teamName,  // Changed from teamName to team_name
+        user_id: user.id,
+        team_name: formData.teamName,
+        team_logo: formData.teamLogo,
         captain_name: formData.captainName,
         players: formData.players.map(player => ({
           name: player.name,
@@ -142,24 +150,24 @@ const CreateMatchModal = () => {
         })),
         category: formData.category,
         security: formData.security,
-        security_amount: formData.security === 'yes' ? formData.securityAmount : null,  // Changed from securityAmount
+        security_amount: formData.security === 'yes' ? formData.securityAmount : null,
         match_bid: formData.matchBid, 
-        custom_bid: formData.matchBid === 'yes' ? formData.customBid : null, // Changed from matchBid
-        match_datetime: new Date(formData.matchDatetime).toISOString(),  // Changed from matchDatetime
-        ball_type: formData.ballType,  // Changed from ballType
+        custom_bid: formData.matchBid === 'yes' ? formData.customBid : null,
+        match_datetime: new Date(formData.matchDatetime).toISOString(),
+        ball_type: formData.ballType,
         venue: formData.venue,
-        match_status: formData.matchStatus,  // Changed from matchStatus
+        match_status: formData.matchStatus,
         overs: formData.overs,
         province: formData.province,
         city: formData.city,
-        join_code: formData.joinCode || generateJoinCode(),  // Changed from joinCode
+        join_code: formData.joinCode || generateJoinCode(),
         rules: formData.rules,
         facilities: formData.facilities,
         equipment: formData.equipment,
-        dress_code: formData.dressCode,  // Changed from dressCode
-        payment_method: formData.paymentMethod  // Changed from paymentMethod
+        dress_code: formData.dressCode,
+        payment_method: formData.paymentMethod
       };
-  console.log(payload);
+
       const response = await axios.post(`${API_URL}/matches`, payload, {
         headers: { 
           Authorization: `Bearer ${token}`,
@@ -171,10 +179,8 @@ const CreateMatchModal = () => {
         showToast('Match created successfully!', 'success');
         setTimeout(() => window.location.reload(), 2000);
       } else {
-        // Handle API-specific error messages
         const errorMsg = response.data.message || 'Failed to create match';
         if (response.data.errors) {
-          // Convert errors object to readable string
           const errorString = Object.entries(response.data.errors)
             .map(([field, errors]) => `${field}: ${errors.join(', ')}`)
             .join('; ');
@@ -206,7 +212,6 @@ const CreateMatchModal = () => {
     return code;
   };
 
-  // Add match rules
   const addRule = () => {
     setFormData(prev => ({
       ...prev,
@@ -214,18 +219,17 @@ const CreateMatchModal = () => {
     }));
   };
 
-  // Update match rule
   const updateRule = (index, value) => {
     const updatedRules = [...formData.rules];
     updatedRules[index] = value;
     setFormData(prev => ({ ...prev, rules: updatedRules }));
   };
 
-  // Remove match rule
   const removeRule = (index) => {
     const updatedRules = formData.rules.filter((_, i) => i !== index);
     setFormData(prev => ({ ...prev, rules: updatedRules }));
   };
+
   const checkTeamNameExists = async (teamName) => {
     try {
       const token = localStorage.getItem("authToken");
@@ -249,8 +253,6 @@ const CreateMatchModal = () => {
     }
   };
   
-  const [selectedCard, setSelectedCard] = useState("silver");
-  
   return (
     <div className="modal fade" id="createMatchModal" tabIndex="-1">
       <div className="modal-dialog modal-xl">
@@ -261,54 +263,51 @@ const CreateMatchModal = () => {
           </div>
 
           <div className="modal-body">
+            <div className="row mb-4 text-center">
+              <div className="col-md-4">
+                <div
+                  className={`p-3 rounded shadow ${selectedCard === "silver" ? "bg-primary" : "bg-warning"}`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setSelectedCard("silver")}
+                >
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+                    alt="Silver Crown"
+                    style={{ height: '50px' }}
+                  />
+                  <h6 className="mt-2">Silver</h6>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div
+                  className={`p-3 rounded shadow ${selectedCard === "gold" ? "bg-primary" : "bg-warning"}`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setSelectedCard("gold")}
+                >
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+                    alt="Gold Crown"
+                    style={{ height: '50px' }}
+                  />
+                  <h6 className="mt-2">Gold</h6>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div
+                  className={`p-3 rounded shadow ${selectedCard === "diamond" ? "bg-primary" : "bg-warning"}`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setSelectedCard("diamond")}
+                >
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
+                    alt="Diamond Crown"
+                    style={{ height: '50px' }}
+                  />
+                  <h6 className="mt-2">Diamond</h6>
+                </div>
+              </div>
+            </div>
 
-          <div className="row mb-4 text-center">
-      <div className="col-md-4">
-        <div
-          className={`p-3 rounded shadow ${selectedCard === "silver" ? "bg-primary" : "bg-warning"}`}
-          style={{ cursor: 'pointer' }}
-          onClick={() => setSelectedCard("silver")}
-        >
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-            alt="Silver Crown"
-            style={{ height: '50px' }}
-          />
-          <h6 className="mt-2">Silver</h6>
-        </div>
-      </div>
-      <div className="col-md-4">
-        <div
-          className={`p-3 rounded shadow ${selectedCard === "gold" ? "bg-primary" : "bg-warning"}`}
-          style={{ cursor: 'pointer' }}
-          onClick={() => setSelectedCard("gold")}
-        >
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-            alt="Gold Crown"
-            style={{ height: '50px' }}
-          />
-          <h6 className="mt-2">Gold</h6>
-        </div>
-      </div>
-      <div className="col-md-4">
-        <div
-          className={`p-3 rounded shadow ${selectedCard === "diamond" ? "bg-primary" : "bg-warning"}`}
-          style={{ cursor: 'pointer' }}
-          onClick={() => setSelectedCard("diamond")}
-        >
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-            alt="Diamond Crown"
-            style={{ height: '50px' }}
-          />
-          <h6 className="mt-2">Diamond</h6>
-        </div>
-      </div>
-    </div>
-
-
-            {/* Stepper */}
             <div className="stepper-wrapper mb-5">
               {[1, 2, 3].map((step) => (
                 <div key={step} className={`stepper-item ${currentStep === step ? 'active' : ''} ${currentStep > step ? 'completed' : ''}`}>
@@ -320,44 +319,84 @@ const CreateMatchModal = () => {
               ))}
             </div>
 
-            {/* Step 1: Team Information */}
             {currentStep === 1 && (
               <div className="team-info-step">
                 <div className="row g-4">
+                  <div className="col-12 text-center mb-3">
+                    <div className="team-logo-upload">
+                      <input
+                        type="file"
+                        className="d-none"
+                        id="teamLogoUpload"
+                        onChange={handleTeamLogoUpload}
+                        accept="image/*"
+                      />
+                      <label 
+                        htmlFor="teamLogoUpload" 
+                        className="d-inline-block"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {formData.teamLogo ? (
+                          <img 
+                            src={formData.teamLogo} 
+                            alt="Team Logo"
+                            className="rounded-circle border"
+                            style={{
+                              width: '120px',
+                              height: '120px',
+                              objectFit: 'cover'
+                            }}
+                          />
+                        ) : (
+                          <div 
+                            className="rounded-circle border d-flex flex-column align-items-center justify-content-center"
+                            style={{
+                              width: '120px',
+                              height: '120px',
+                              backgroundColor: '#f8f9fa'
+                            }}
+                          >
+                            <i className="fas fa-camera fa-2x text-secondary mb-2"></i>
+                            <small className="text-muted">Upload Team Logo</small>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+
                   <div className="col-md-6">
                     <div className="form-group">
                       <label className="form-label">Team Name <span className="text-danger">*</span></label>
                       <input
-          type="text"
-          className={`form-control form-control-lg ${errors.teamName ? 'is-invalid' : ''}`}
-          value={formData.teamName}
-          onChange={async (e) => {
-            const value = e.target.value;
-            setFormData(prev => ({ ...prev, teamName: value }));
+                        type="text"
+                        className={`form-control form-control-lg ${errors.teamName ? 'is-invalid' : ''}`}
+                        value={formData.teamName}
+                        onChange={async (e) => {
+                          const value = e.target.value;
+                          setFormData(prev => ({ ...prev, teamName: value }));
 
-            if (value.trim() === '') {
-              setErrors(prev => ({ ...prev, teamName: 'Team name is required' }));
-              return;
-            }
+                          if (value.trim() === '') {
+                            setErrors(prev => ({ ...prev, teamName: 'Team name is required' }));
+                            return;
+                          }
 
-            setCheckingTeamName(true);
-            const exists = await checkTeamNameExists(value);
-            setCheckingTeamName(false);
+                          setCheckingTeamName(true);
+                          const exists = await checkTeamNameExists(value);
+                          setCheckingTeamName(false);
 
-            setErrors(prev => ({
-              ...prev,
-              teamName: exists ? 'Team name already exists' : ''
-            }));
-          }}
-        />
-         {checkingTeamName && (
-          <div className="form-text text-primary small mt-1">
-            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-            Checking team name...
-          </div>
-        )}
-{errors.teamName && <div className="invalid-feedback">{errors.teamName}</div>}
-
+                          setErrors(prev => ({
+                            ...prev,
+                            teamName: exists ? 'Team name already exists' : ''
+                          }));
+                        }}
+                      />
+                      {checkingTeamName && (
+                        <div className="form-text text-primary small mt-1">
+                          <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                          Checking team name...
+                        </div>
+                      )}
+                      {errors.teamName && <div className="invalid-feedback">{errors.teamName}</div>}
                     </div>
                   </div>
 
@@ -380,7 +419,6 @@ const CreateMatchModal = () => {
                       <input
                         type="number"
                         className={`form-control form-control-lg ${errors.captainName ? 'is-invalid' : ''}`}
-                        
                       />
                     </div>
                   </div>
@@ -391,9 +429,7 @@ const CreateMatchModal = () => {
                       <input
                         type="number"
                         className={`form-control form-control-lg ${errors.captainName ? 'is-invalid' : ''}`}
-                        
                       />
-                     
                     </div>
                   </div>
 
@@ -504,7 +540,6 @@ const CreateMatchModal = () => {
               </div>
             )}
 
-            {/* Step 2: Match Details */}
             {currentStep === 2 && (
               <div className="match-details-step">
                 <div className="row g-4">
@@ -569,53 +604,46 @@ const CreateMatchModal = () => {
                         </select>
                         {formData.security === 'yes' && (
                           <div className="form-group mt-2">
-      <label className="form-label"> Amount</label>
-                          <input
-                            type="number"
-                            className={`form-control ${errors.securityAmount ? 'is-invalid' : ''}`}
-                            placeholder="Amount"
-                            value={formData.securityAmount}
-                            onChange={e => setFormData(prev => ({ ...prev, securityAmount: e.target.value }))}
-                          />
+                            <label className="form-label">Amount</label>
+                            <input
+                              type="number"
+                              className={`form-control ${errors.securityAmount ? 'is-invalid' : ''}`}
+                              placeholder="Amount"
+                              value={formData.securityAmount}
+                              onChange={e => setFormData(prev => ({ ...prev, securityAmount: e.target.value }))}
+                            />
+                            {errors.securityAmount && <div className="invalid-feedback">{errors.securityAmount}</div>}
                           </div>
                         )}
                       </div>
-                      {errors.securityAmount && <div className="invalid-feedback">{errors.securityAmount}</div>}
                     </div>
                   </div>
 
                   <div className="col-md-4">
-  <div className="form-group">
-    <label className="form-label">Match Bid</label>
-    <select
-      className="form-select"
-      value={formData.matchBid}
-      onChange={e =>
-        setFormData(prev => ({ ...prev, matchBid: e.target.value }))
-      }
-    >
-      <option value="no">No</option>
-      <option value="yes">Yes</option>
-    </select>
-  </div>
-
-  {/* Show custom input only if 'yes' is selected */}
-  {formData.matchBid === "yes" && (
-    <div className="form-group mt-2">
-      <label className="form-label"> Amount</label>
-      <input
-        type="number"
-        className="form-control"
-        placeholder="Enter custom amount"
-        value={formData.customBid || ""}
-        onChange={e =>
-          setFormData(prev => ({ ...prev, customBid: e.target.value }))
-        }
-      />
-    </div>
-  )}
-</div>
-
+                    <div className="form-group">
+                      <label className="form-label">Match Bid</label>
+                      <select
+                        className="form-select"
+                        value={formData.matchBid}
+                        onChange={e => setFormData(prev => ({ ...prev, matchBid: e.target.value }))}
+                      >
+                        <option value="no">No</option>
+                        <option value="yes">Yes</option>
+                      </select>
+                      {formData.matchBid === "yes" && (
+                        <div className="form-group mt-2">
+                          <label className="form-label">Amount</label>
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Enter custom amount"
+                            value={formData.customBid || ""}
+                            onChange={e => setFormData(prev => ({ ...prev, customBid: e.target.value }))}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
                   <div className="col-md-4">
                     <div className="form-group">
@@ -775,7 +803,6 @@ const CreateMatchModal = () => {
               </div>
             )}
 
-            {/* Step 3: Review & Submit */}
             {currentStep === 3 && (
               <div className="review-step">
                 <div className="card mb-4 shadow">
@@ -783,6 +810,20 @@ const CreateMatchModal = () => {
                     <h6 className="mb-0">Team Information</h6>
                   </div>
                   <div className="card-body">
+                    <div className="text-center mb-3">
+                      {formData.teamLogo && (
+                        <img 
+                          src={formData.teamLogo} 
+                          alt="Team Logo"
+                          className="rounded-circle border"
+                          style={{
+                            width: '100px',
+                            height: '100px',
+                            objectFit: 'cover'
+                          }}
+                        />
+                      )}
+                    </div>
                     <dl className="row mb-0">
                       <dt className="col-sm-3 text-muted">Team Name</dt>
                       <dd className="col-sm-9">{formData.teamName}</dd>
@@ -920,7 +961,6 @@ const CreateMatchModal = () => {
         </div>
       </div>
 
-      {/* Toast Notification */}
       {toast.show && (
         <div className={`toast position-fixed bottom-0 end-0 m-3 ${toast.type === 'success' ? 'bg-success' : 'bg-danger'}`}>
           <div className="toast-body text-white d-flex align-items-center">
@@ -933,81 +973,66 @@ const CreateMatchModal = () => {
           </div>
         </div>
       )}
-
       <style>{`
-        .stepper-wrapper {
-          display: flex;
-          justify-content: space-between;
-          margin: 2rem 0 4rem;
-          position: relative;
-        }
-        
-        .stepper-wrapper::before {
-          content: '';
-          position: absolute;
-          top: 20px;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background-color: #dee2e6;
-          z-index: -1;
-        }
-        
-        .stepper-item {
-          position: relative;
-          flex: 1;
-          text-align: center;
-          z-index: 1;
-        }
-        
-        .step-counter {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background-color: #e9ecef;
-          color: #6c757d;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 0.5rem;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-        
-        .stepper-item.active .step-counter {
-          background-color: #0d6efd;
-          color: white;
-          transform: scale(1.1);
-        }
-        
-        .stepper-item.completed .step-counter {
-          background-color: #198754;
-          color: white;
-        }
-        
-        .step-name {
-          color: #6c757d;
-          font-weight: 500;
-          transition: color 0.3s ease;
-        }
-        
-        .stepper-item.active .step-name {
-          color: #0d6efd;
-          font-weight: 600;
-        }
-        
-        .avatar-preview:hover {
-          border-color: #0d6efd !important;
-          transform: scale(1.05);
-        }
-        
-        .toast {
-          min-width: 300px;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-      `}</style>
-    </div>
+  .stepper-wrapper {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0 4rem;
+    position: relative;
+  }
+
+  .stepper-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #dee2e6; /* light gray line */
+    z-index: 1;
+  }
+
+  .stepper-item {
+    position: relative;
+    z-index: 2;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .stepper-item .step-counter {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #dee2e6;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+
+  .stepper-item.active .step-counter {
+    background-color: #0d6efd; /* primary color for active step */
+    color: #fff;
+  }
+
+  .stepper-item.completed .step-counter {
+    background-color: #198754; /* green for completed step */
+    color: #fff;
+  }
+
+  .stepper-item .step-name {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+  }
+`}</style>
+
+    </div> 
   );
 };
 
