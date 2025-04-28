@@ -25,7 +25,8 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
   const history = safeParse(match.history || []);
 
   // Check if current user is the creator of the match
-  const isCreator = currentUser && match.user_id === match.user.id;
+  const isCreator = currentUser?.id === match.user_id; // Compare ids to determine if current user is the match creator
+
   const handleOpen = (e) => {
     e.preventDefault();
     setShowModal(true);
@@ -57,7 +58,6 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
               </div>
               <div className="modal-body">
                 <div className="container-fluid">
-
                   {/* Team Members */}
                   <div className="row mb-4">
                     <div className="col-12">
@@ -66,8 +66,7 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
                         {teamMembers.map((member, index) => (
                           <div className="col-md-6" key={index}>
                             <div className="d-flex align-items-center p-2 bg-light rounded">
-                              {/* Player Image */}
-                              <div 
+                              <div
                                 className="avatar-upload me-3"
                                 style={{
                                   width: '60px',
@@ -110,7 +109,6 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
                     </div>
                   </div>
 
-                  {/* Rest of your existing modal content remains the same */}
                   {/* Match Info */}
                   <div className="row g-4 mb-4">
                     <div className="col-md-6">
@@ -269,15 +267,7 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
 
                   {/* Action Buttons */}
                   <div className="d-flex justify-content-center gap-3 mt-4">
-                    {!isCreator && (
-                      <button
-                        className="btn btn-primary px-4"
-                        onClick={handleRequestClick}
-                      >
-                        <i className="fas fa-calendar-check me-2"></i>Request Match
-                      </button>
-                    )}
-                    {isCreator && (
+                    {isCreator ? (
                       <button 
                         className="btn btn-outline-secondary px-4"
                         onClick={() => {
@@ -287,7 +277,15 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
                       >
                         Edit
                       </button>
+                    ) : (
+                      <button
+                        className="btn btn-primary px-4"
+                        onClick={handleRequestClick}
+                      >
+                        <i className="fas fa-calendar-check me-2"></i>Request Match
+                      </button>
                     )}
+
                     <button
                       className="btn btn-outline-secondary px-4"
                       onClick={() => setShowHistory(!showHistory)}
@@ -301,6 +299,7 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
           </div>
         </div>
       )}
+
       {showRequestModal && (
         <RequestPageEditor 
           onClose={() => setShowRequestModal(false)}
@@ -316,7 +315,6 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
           match={match} 
           onClose={() => setShowEditModal(false)}
           onUpdate={(updatedMatch) => {
-            // Handle the updated match data if needed
             setShowEditModal(false);
           }}
         />

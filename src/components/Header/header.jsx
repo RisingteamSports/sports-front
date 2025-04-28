@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import ProfileUpdateModal from "../Edit_profile";
 import CreateMatchModal from "../models/createNewMatch";
 import Notifications from "../models/NotificationPop";
-import AccountSummaryModal from "../models/showalanceDetails"
+import AccountSummaryModal from "../models/showalanceDetails";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -13,7 +12,7 @@ const Navbar = () => {
   const [profile, setProfile] = useState(
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM8LrGjiUDcvYjUMk7jUJJZo0kK4Y4NzKxmQ&s"
   );
-  const [showAccountModal, setShowAccountModal] = useState(false); // Account summary modal state
+  const [showAccountModal, setShowAccountModal] = useState(false);
   const accountStats = {
     matchesWon: 12,
     matchesLost: 5,
@@ -25,7 +24,6 @@ const Navbar = () => {
     ]
   };
 
-  // Fetch user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -41,7 +39,6 @@ const Navbar = () => {
     }
   }, [modalView]);
 
-  // Logout function
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
@@ -54,19 +51,17 @@ const Navbar = () => {
 
   const handleAccountClick = (e) => {
     e.preventDefault();
-    setShowAccountModal(true); // Open the account modal
+    setShowAccountModal(true);
   };
 
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-transparent shadow-sm">
         <div className="container d-flex justify-content-between p-0">
-          {/* Logo */}
           <Link to="/" className="navbar-brand">
             <h3 className="Logo-text">Match Dada</h3>
           </Link>
 
-          {/* Navbar Toggle for Mobile */}
           <button
             className="navbar-toggler border"
             type="button"
@@ -79,7 +74,6 @@ const Navbar = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          {/* Navbar Links */}
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item mx-2">
@@ -89,10 +83,10 @@ const Navbar = () => {
                 <Link to="/all-teams" className="nav-link text-dark">All Teams</Link>
               </li>
               <li className="nav-item mx-2">
-                <Link to="/all-teams" className="nav-link text-dark">Shop</Link>
+                <Link to="" className="nav-link text-dark">Shop</Link> {/* ✅ Corrected */}
               </li>
               <li className="nav-item mx-2">
-                <Link to="" className="nav-link text-dark" data-bs-toggle={user ? "modal" : ""} data-bs-target={user ? "#createMatchModal" : ""} onClick={(e) => { if (!user) { e.preventDefault(); navigate("/login"); }}}>  Match </Link>
+                <Link to="" className="nav-link text-dark" data-bs-toggle={user ? "modal" : ""} data-bs-target={user ? "#createMatchModal" : ""} onClick={(e) => { if (!user) { e.preventDefault(); navigate("/login"); } }}>Match</Link>
               </li>
               <li className="nav-item mx-2">
                 <Link to="/contact-us" className="nav-link text-dark">Contact Us</Link>
@@ -100,15 +94,11 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {/* Profile & Notifications */}
           <div className="d-flex align-items-center">
             {user ? (
               <>
-                {/* Notifications and Chat Icon */}
                 <div className="me-3 d-flex align-items-center">
                   <Notifications />
-
-                  {/* Chat Icon */}
                   <button
                     className="border-0 text-center text-decoration-none text-white icon-link position-relative ms-3 mb-2"
                     onClick={() => navigate("/chat")}
@@ -117,8 +107,6 @@ const Navbar = () => {
                     <i className="bi bi-chat-dots-fill fs-5"></i>
                   </button>
                 </div>
-
-                {/* Profile Dropdown */}
                 <div className="dropdown">
                   <button
                     className="text-dark fw-bold dropdown-toggle p-0 border-0 bg-transparent"
@@ -134,31 +122,12 @@ const Navbar = () => {
                       style={{ objectFit: "cover" }}
                     />
                   </button>
-
                   <ul className="dropdown-menu dropdown-menu-end bg-light border border-secondary">
-                    <li>
-                      <button className="dropdown-item text-dark fw-bold" onClick={() => setModalView("profile")}>
-                        Profile
-                      </button>
-                    </li>
-                    <li>
-                      <button className="dropdown-item text-dark fw-bold" onClick={handleAccountClick}>
-                        My Account
-                      </button>
-                    </li>
-                    <li>
-                      <button className="dropdown-item text-dark fw-bold" onClick={() => setModalView("password")}>
-                        Change Password
-                      </button>
-                    </li>
-                    <li>
-                      <Link to="/my-teams" className="dropdown-item text-dark fw-bold">My Team</Link>
-                    </li>
-                    <li>
-                      <button className="dropdown-item text-danger fw-bold" onClick={handleLogout}>
-                        Log Out
-                      </button>
-                    </li>
+                    <li><button className="dropdown-item text-dark fw-bold" onClick={() => setModalView("profile")}>Profile</button></li>
+                    <li><button className="dropdown-item text-dark fw-bold" onClick={handleAccountClick}>My Account</button></li>
+                    <li><button className="dropdown-item text-dark fw-bold" onClick={() => setModalView("password")}>Change Password</button></li>
+                    <li><Link to="/my-teams" className="dropdown-item text-dark fw-bold">My Team</Link></li>
+                    <li><button className="dropdown-item text-danger fw-bold" onClick={handleLogout}>Log Out</button></li>
                   </ul>
                 </div>
               </>
@@ -169,18 +138,9 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Profile Update Modal */}
       {modalView && <ProfileUpdateModal view={modalView} onClose={() => setModalView(null)} />}
-
-      {/* Create Match Modal */}
       <CreateMatchModal />
-
-      {/* Account Summary Modal */}
-      <AccountSummaryModal
-        show={showAccountModal}
-        onClose={() => setShowAccountModal(false)}
-        accountStats={accountStats}
-      />
+      <AccountSummaryModal show={showAccountModal} onClose={() => setShowAccountModal(false)} accountStats={accountStats} />
     </>
   );
 };

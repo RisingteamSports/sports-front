@@ -14,7 +14,6 @@ import AllTeams from './components/TeamManagement/AllTeams';
 function App() {
   const [lastActivity, setLastActivity] = useState(localStorage.getItem('lastActivity') || Date.now());
 
-
   // Check for inactivity and log out after 24 hours
   useEffect(() => {
     const checkInactivity = () => {
@@ -45,13 +44,11 @@ function App() {
     };
   }, [lastActivity]);
 
-
-
   return (
     <Router>
       <div className="App">
         <Routes>
-           <Route path="/login" element={<AuthContainer />} /> 
+          <Route path="/login" element={<AuthContainer />} /> 
           <Route path="/" element={<Home />} />
           <Route path="/contact-us" element={<ProtectedRoute><ContactUs /></ProtectedRoute>} />
           <Route path="/edit-profile" element={<ProtectedRoute><ProfileUpdateModal /></ProtectedRoute>} />
@@ -60,7 +57,6 @@ function App() {
           <Route path="/my-teams" element={<ProtectedRoute><MyTeams /></ProtectedRoute>} /> 
           <Route path="/all-teams" element={<ProtectedRoute><AllTeams /></ProtectedRoute>} /> 
           <Route path="/scoreboard" element={<Scoreboard />} />
-         
         </Routes>
       </div>
     </Router>

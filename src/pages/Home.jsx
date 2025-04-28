@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Navbar from '../components/Header/header';
 import AllMatches from './Matches';
 import '../style/main.css';
-import FilterButtonWithModal from '../components/models/FilterModel';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,8 +23,6 @@ const Home = () => {
         <Navbar />
         <AllMatches home="home"/>
       </div>
-
-      <FilterButtonWithModal />
     </>
   );
 };
