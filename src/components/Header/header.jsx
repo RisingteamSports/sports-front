@@ -83,7 +83,7 @@ const Navbar = () => {
                 <Link to="/all-teams" className="nav-link text-dark">All Teams</Link>
               </li>
               <li className="nav-item mx-2">
-                <Link to="" className="nav-link text-dark">Shop</Link> {/* ✅ Corrected */}
+                <Link to="/shop" className="nav-link text-dark">Shop</Link> {/* ✅ Corrected */}
               </li>
               <li className="nav-item mx-2">
                 <Link to="" className="nav-link text-dark" data-bs-toggle={user ? "modal" : ""} data-bs-target={user ? "#createMatchModal" : ""} onClick={(e) => { if (!user) { e.preventDefault(); navigate("/login"); } }}>Match</Link>
