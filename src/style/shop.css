@@ -1,11 +1,45 @@
-.product-action {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem; /* Add this line to give spacing between buttons */
+.shop-container {
+  padding-bottom: 3rem;
 }
 
-.product-img:hover .product-action {
-  opacity: 1;
+.product-card {
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+  background-color: #f8f9fa;
+}
+
+.page-link {
+  color: #3498db;
+}
+
+.page-item.active .page-link {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .product-card {
+    margin-bottom: 1rem;
+  }
+  
+  .card-img-top {
+    height: 150px !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
 }

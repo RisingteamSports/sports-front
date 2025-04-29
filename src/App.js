@@ -60,7 +60,7 @@ function App() {
           <Route path="/all-teams" element={<ProtectedRoute><AllTeams /></ProtectedRoute>} /> 
           <Route path="/scoreboard" element={<Scoreboard />} />
           <Route path="/shop" element={<ProtectedRoute><Shop /></ProtectedRoute>} /> {/* Added Shop route */}
-          <Route path="/shop-detail" element={<ProtectedRoute><ShopDetail /></ProtectedRoute>} />
+          <Route path="/shop-detail/:id" element={<ProtectedRoute><ShopDetail /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>

@@ -11,6 +11,55 @@ import Navbar from "./Header/header";
 const ShopDetail = () => {
   const [activeTab, setActiveTab] = useState("tab-pane-1");
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [rating, setRating] = useState(0);
+
+  // Color definitions with names and hex values
+  const colors = [
+    { name: "Black", hex: "#2c3e50" },
+    { name: "White", hex: "#ecf0f1" },
+    { name: "Red", hex: "#e74c3c" },
+    { name: "Blue", hex: "#3498db" },
+    { name: "Green", hex: "#2ecc71" }
+  ];
+
+  // Reusable gradient style
+  const gradientStyle = {
+    background: 'linear-gradient(135deg, #3498db, #2980b9)',
+    border: 'none',
+    color: 'white'
+  };
+
+  const gradientHoverStyle = {
+    background: 'linear-gradient(135deg, #2980b9, #3498db)',
+    boxShadow: '0 6px 12px rgba(52, 152, 219, 0.4)'
+  };
+
+  // Custom button component
+  const PrimaryButton = ({ children, icon, onClick, fullWidth = false }) => (
+    <button 
+      className={`btn px-4 py-2 rounded-1 ${fullWidth ? 'w-100' : ''}`}
+      style={{
+        ...gradientStyle,
+        fontWeight: '600',
+        boxShadow: '0 4px 8px rgba(52, 152, 219, 0.3)',
+        transition: 'all 0.3s ease'
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.background = gradientHoverStyle.background;
+        e.target.style.boxShadow = gradientHoverStyle.boxShadow;
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.background = gradientStyle.background;
+        e.target.style.boxShadow = '0 4px 8px rgba(52, 152, 219, 0.3)';
+      }}
+      onClick={onClick}
+    >
+      {icon && <i className={`fas ${icon} me-2`}></i>}
+      {children}
+    </button>
+  );
 
   const sliderSettings = {
     dots: true,
@@ -20,25 +69,33 @@ const ShopDetail = () => {
     slidesToScroll: 1,
     arrows: true,
     prevArrow: <PrevArrow />,
-    nextArrow: <NextArrow />
+    nextArrow: <NextArrow />,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          arrows: false,
+          dots: true
+        }
+      }
+    ]
   };
 
   function PrevArrow(props) {
     const { onClick } = props;
     return (
       <button 
-        className="slick-arrow slick-prev" 
+        className="slick-arrow slick-prev btn rounded-circle d-none d-lg-flex" 
         onClick={onClick}
         style={{
-          left: '10px',
+          ...gradientStyle,
+          left: '-15px',
           zIndex: 1,
-          background: 'transparent',
-          border: 'none',
-          fontSize: '24px',
-          color: '#000'
+          width: '40px',
+          height: '40px',
         }}
       >
-        <i className="fa fa-angle-left"></i>
+        <i className="fas fa-chevron-left"></i>
       </button>
     );
   }
@@ -47,278 +104,444 @@ const ShopDetail = () => {
     const { onClick } = props;
     return (
       <button 
-        className="slick-arrow slick-next" 
+        className="slick-arrow slick-next btn rounded-circle d-none d-lg-flex" 
         onClick={onClick}
         style={{
-          right: '10px',
+          ...gradientStyle,
+          right: '-15px',
           zIndex: 1,
-          background: 'transparent',
-          border: 'none',
-          fontSize: '24px',
-          color: '#000'
+          width: '40px',
+          height: '40px',
         }}
       >
-        <i className="fa fa-angle-right"></i>
+        <i className="fas fa-chevron-right"></i>
       </button>
     );
   }
 
   return (
-    <div className="container-fluid pb-5">
-    <Navbar />
-      <div className="row px-xl-5">
-        <div className="col-lg-5 mb-30">
-          <div className="bg-light" style={{ padding: '30px' }}>
-            <Slider {...sliderSettings}>
-              <div>
-                <img src={product1} alt="Product" className="w-100" style={{ height: '400px', objectFit: 'contain' }} />
+    <div className="container-fluid pb-5 bg-light">
+      <Navbar />
+      <div className="container py-3 py-md-5">
+        {/* Breadcrumb */}
+        <nav aria-label="breadcrumb" className="mb-3 mb-md-4">
+          <ol className="breadcrumb bg-transparent px-0">
+            <li className="breadcrumb-item"><a href="#" className="text-decoration-none">Home</a></li>
+            <li className="breadcrumb-item"><a href="#" className="text-decoration-none">Shop</a></li>
+            <li className="breadcrumb-item active" aria-current="page">Product Detail</li>
+          </ol>
+        </nav>
+
+        <div className="row">
+          {/* Product Images */}
+          <div className="col-lg-5 mb-4 mb-lg-0">
+            <div className="border rounded-4 p-2 p-md-3 shadow-sm bg-white">
+              <Slider {...sliderSettings}>
+                {[product1, product2, product3, product4].map((img, index) => (
+                  <div key={index}>
+                    <img 
+                      src={img} 
+                      alt={`Product ${index + 1}`} 
+                      className="img-fluid w-100 rounded-3" 
+                      style={{ 
+                        height: 'auto',
+                        maxHeight: '500px',
+                        objectFit: 'contain',
+                        aspectRatio: '1/1'
+                      }} 
+                    />
+                  </div>
+                ))}
+              </Slider>
+            </div>
+          </div>
+
+          {/* Product Details */}
+          <div className="col-lg-7">
+            <div className="ps-lg-4 ps-xl-5">
+              <div className="border-0 rounded-4 p-3 p-md-5 shadow-sm bg-white">
+                <h2 className="fw-bold mb-2 mb-md-3">Premium Comfort Sneakers</h2>
+                
+                <div className="d-flex align-items-center mb-2 mb-md-3">
+                  <div className="text-warning me-2">
+                    {[...Array(5)].map((_, i) => (
+                      <i key={i} className={`fas ${i < 4 ? 'fa-star' : 'fa-star-half-alt'}`}></i>
+                    ))}
+                  </div>
+                  <small className="text-muted">
+                    <span className="fw-semibold text-dark">4.7</span> (99 Reviews)
+                  </small>
+                </div>
+                
+                <div className="mb-3 mb-md-4 position-relative">
+                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#3498db' }}>$150.00</h3>
+                  <del className="text-muted small">$200.00</del>
+                  <span className="badge bg-success ms-2 align-middle">25% OFF</span>
+                </div>
+                
+                <p className="mb-3 mb-md-4 text-muted">
+                  Experience ultimate comfort with our premium sneakers. Designed with breathable mesh and cushioned soles, 
+                  these shoes provide all-day support for your active lifestyle. The perfect blend of style and functionality.
+                </p>
+                
+                {/* Size Selection */}
+                <div className="mb-3 mb-md-4">
+                  <h6 className="fw-bold mb-2 mb-md-3">SELECT SIZE:</h6>
+                  <div className="d-flex flex-wrap gap-2">
+                    {["XS", "S", "M", "L", "XL"].map((size, index) => (
+                      <button
+                        key={index}
+                        className={`btn btn-sm rounded-1 ${selectedSize === size ? '' : 'btn-outline-secondary'}`}
+                        onClick={() => setSelectedSize(size)}
+                        style={{
+                          minWidth: '50px',
+                          padding: '0.4rem 0',
+                          fontWeight: '600',
+                          ...(selectedSize === size ? gradientStyle : {}),
+                          ...(selectedSize === size ? { boxShadow: '0 4px 8px rgba(52, 152, 219, 0.3)' } : {})
+                        }}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  <a href="#" className="d-block mt-2 text-decoration-none small" style={{ color: '#3498db' }}>
+                    <i className="fas fa-ruler me-1"></i> Size Guide
+                  </a>
+                </div>
+
+                {/* Color Selection */}
+                <div className="mb-3 mb-md-4">
+                  <h6 className="fw-bold mb-2 mb-md-3">SELECT COLOR:</h6>
+                  <div className="d-flex flex-wrap align-items-center gap-2">
+                    {colors.map((color, index) => (
+                      <div 
+                        key={index}
+                        className="color-option position-relative"
+                        onClick={() => setSelectedColor(color.name)}
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          backgroundColor: color.hex,
+                          border: selectedColor === color.name ? '3px solid #3498db' : '1px solid #ddd',
+                          boxShadow: selectedColor === color.name ? '0 0 0 2px rgba(52, 152, 219, 0.3)' : 'none',
+                          cursor: 'pointer'
+                        }}
+                        title={color.name}
+                      >
+                        {selectedColor === color.name && (
+                          <i className="fas fa-check text-white position-absolute top-50 start-50 translate-middle"></i>
+                        )}
+                      </div>
+                    ))}
+                    <span className="ms-2 small text-muted">
+                      {selectedColor || "Select color"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Quantity and Add to Cart */}
+                <div className="d-flex flex-wrap align-items-center mb-3 mb-md-4 pt-2">
+                  <div className="input-group quantity me-3 mb-2 mb-md-0" style={{ width: "140px" }}>
+                    <button 
+                      className="btn rounded-start"
+                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                      style={gradientStyle}
+                    >
+                      <i className="fas fa-minus"></i>
+                    </button>
+                    <input
+                      type="text"
+                      className="form-control text-center"
+                      value={quantity}
+                      readOnly
+                      style={{
+                        fontWeight: '600',
+                        color: '#2c3e50',
+                        backgroundColor: '#f8f9fa',
+                        border: '1px solid #3498db'
+                      }}
+                    />
+                    <button 
+                      className="btn rounded-end"
+                      onClick={() => setQuantity(q => q + 1)}
+                      style={gradientStyle}
+                    >
+                      <i className="fas fa-plus"></i>
+                    </button>
+                  </div>
+                  <PrimaryButton icon="fa-shopping-cart" onClick={() => {}}>
+                    Add To Cart
+                  </PrimaryButton>
+                  <button 
+                    className="btn btn-outline-danger px-3 px-md-4 py-2 rounded-1 ms-2 ms-md-3 mt-2 mt-md-0"
+                    style={{ fontWeight: '600' }}
+                  >
+                    <i className="fas fa-heart me-2"></i> Wishlist
+                  </button>
+                </div>
+
+                {/* Delivery Info */}
+                <div className="alert alert-light border mb-3 mb-md-4" style={{ borderColor: '#3498db' }}>
+                  <div className="d-flex align-items-center">
+                    <i className="fas fa-truck me-3" style={{ fontSize: '1.5rem', color: '#3498db' }}></i>
+                    <div>
+                      <h6 className="mb-1 fw-bold">Free Delivery</h6>
+                      <p className="mb-0 small text-muted">Estimated delivery: 2-4 business days</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Share */}
+                <div className="d-flex align-items-center pt-3 border-top">
+                  <strong className="text-dark me-3">Share:</strong>
+                  <div className="d-flex">
+                    {['facebook-f', 'twitter', 'instagram', 'pinterest'].map((social, i) => (
+                      <a 
+                        key={i} 
+                        href="#" 
+                        className="btn btn-sm rounded-circle me-2 d-flex align-items-center justify-content-center"
+                        style={{ 
+                          width: '36px', 
+                          height: '36px',
+                          ...gradientStyle
+                        }}
+                      >
+                        <i className={`fab fa-${social}`}></i>
+                      </a>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div>
-                <img src={product2} alt="Product" className="w-100" style={{ height: '400px', objectFit: 'contain' }} />
-              </div>
-              <div>
-                <img src={product3} alt="Product" className="w-100" style={{ height: '400px', objectFit: 'contain' }} />
-              </div>
-              <div>
-                <img src={product4} alt="Product" className="w-100" style={{ height: '400px', objectFit: 'contain' }} />
-              </div>
-            </Slider>
+            </div>
           </div>
         </div>
 
-        {/* Rest of your existing product details code remains exactly the same */}
-        <div className="col-lg-7 h-auto mb-30">
-          <div className="h-100 bg-light p-30">
-            <h3>Product Name Goes Here</h3>
-            <div className="d-flex mb-3">
-              <div className="text-primary mr-2">
-                <small className="fas fa-star"></small>
-                <small className="fas fa-star"></small>
-                <small className="fas fa-star"></small>
-                <small className="fas fa-star-half-alt"></small>
-                <small className="far fa-star"></small>
-              </div>
-              <small className="pt-1">(99 Reviews)</small>
-            </div>
-            <h3 className="font-weight-semi-bold mb-4">$150.00</h3>
-            <p className="mb-4">
-              Volup erat ipsum diam elitr rebum et dolor. Est nonumy elitr erat diam stet sit clita ea. Sanc ipsum
-              et, labore clita lorem magna duo dolor no sea Nonumy
-            </p>
-            <div className="d-flex mb-3">
-              <strong className="text-dark mr-3">Sizes:</strong>
-              <form>
-                {["XS", "S", "M", "L", "XL"].map((size, index) => (
-                  <div key={index} className="custom-control custom-radio custom-control-inline">
-                    <input
-                      type="radio"
-                      className="custom-control-input"
-                      id={`size-${index + 1}`}
-                      name="size"
-                    />
-                    <label className="custom-control-label" htmlFor={`size-${index + 1}`}>
-                      {size}
-                    </label>
-                  </div>
+        {/* Product Tabs */}
+        <div className="row mt-4 mt-md-5">
+          <div className="col-12">
+            <div className="border-0 rounded-4 shadow-sm bg-white overflow-hidden">
+              <ul className="nav nav-tabs border-bottom" id="productTab" role="tablist">
+                {[
+                  { id: "tab-pane-1", label: "Description" },
+                  { id: "tab-pane-2", label: "Additional Info" },
+                  { id: "tab-pane-3", label: "Reviews (99)" }
+                ].map((tab) => (
+                  <li className="nav-item" role="presentation" key={tab.id}>
+                    <button
+                      className={`nav-link ${activeTab === tab.id ? "active" : ""}`}
+                      onClick={() => setActiveTab(tab.id)}
+                      style={{
+                        padding: '0.75rem 1rem',
+                        fontWeight: '600',
+                        border: 'none',
+                        color: activeTab === tab.id ? 'white' : '#7f8c8d',
+                        backgroundColor: activeTab === tab.id ? '#3498db' : 'transparent',
+                        background: activeTab === tab.id ? 'linear-gradient(135deg, #3498db, #2980b9)' : 'none'
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  </li>
                 ))}
-              </form>
-            </div>
+              </ul>
 
-            <div className="d-flex mb-4">
-              <strong className="text-dark mr-3">Colors:</strong>
-              <form>
-                {["Black", "White", "Red", "Blue", "Green"].map((color, index) => (
-                  <div key={index} className="custom-control custom-radio custom-control-inline">
-                    <input
-                      type="radio"
-                      className="custom-control-input"
-                      id={`color-${index + 1}`}
-                      name="color"
-                    />
-                    <label className="custom-control-label" htmlFor={`color-${index + 1}`}>
-                      {color}
-                    </label>
-                  </div>
-                ))}
-              </form>
-            </div>
-
-            <div className="d-flex align-items-center mb-4 pt-2">
-              <div className="input-group quantity mr-3" style={{ width: "130px" }}>
-                <div className="input-group-btn">
-                  <button 
-                    className="btn btn-primary btn-minus" 
-                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  >
-                    <i className="fa fa-minus"></i>
-                  </button>
+              <div className="tab-content p-3 p-md-4" id="productTabContent">
+                {/* Description Tab */}
+                <div className={`tab-pane fade ${activeTab === "tab-pane-1" ? "show active" : ""}`}>
+                  <h4 className="mb-3 mb-md-4 fw-bold">Product Description</h4>
+                  <p className="text-muted">
+                    Our premium comfort sneakers are crafted with the highest quality materials to ensure durability and comfort. 
+                    The breathable mesh upper keeps your feet cool while the cushioned insole provides exceptional support for all-day wear.
+                  </p>
+                  <ul className="list-unstyled text-muted">
+                    {[
+                      "Breathable mesh upper",
+                      "Cushioned insole for all-day comfort",
+                      "Flexible rubber outsole for traction",
+                      "Lightweight design",
+                      "Available in multiple colors"
+                    ].map((item, i) => (
+                      <li key={i} className="mb-2">
+                        <i className="fas fa-check me-2" style={{ color: '#3498db' }}></i>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <input
-                  type="text"
-                  className="form-control bg-secondary border-0 text-center"
-                  value={quantity}
-                  readOnly
-                />
-                <div className="input-group-btn">
-                  <button 
-                    className="btn btn-primary btn-plus" 
-                    onClick={() => setQuantity(q => q + 1)}
-                  >
-                    <i className="fa fa-plus"></i>
-                  </button>
-                </div>
-              </div>
-              <button className="btn btn-primary px-3">
-                <i className="fa fa-shopping-cart mr-1"></i> Add To Cart
-              </button>
-            </div>
 
-            <div className="d-flex pt-2">
-              <strong className="text-dark mr-2">Share on:</strong>
-              <div className="d-inline-flex">
-                <a className="text-dark px-2" href="">
-                  <i className="fab fa-facebook-f"></i>
-                </a>
-                <a className="text-dark px-2" href="">
-                  <i className="fab fa-twitter"></i>
-                </a>
-                <a className="text-dark px-2" href="">
-                  <i className="fab fa-linkedin-in"></i>
-                </a>
-                <a className="text-dark px-2" href="">
-                  <i className="fab fa-pinterest"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs section - remains exactly the same as before */}
-      <div className="row px-xl-5">
-        <div className="col">
-          <div className="bg-light p-30">
-            <div className="nav nav-tabs mb-4">
-              <a 
-                className={`nav-item nav-link text-dark ${activeTab === "tab-pane-1" ? "active" : ""}`} 
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab("tab-pane-1");
-                }}
-                href="#tab-pane-1"
-              >
-                Description
-              </a>
-              <a 
-                className={`nav-item nav-link text-dark ${activeTab === "tab-pane-2" ? "active" : ""}`} 
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab("tab-pane-2");
-                }}
-                href="#tab-pane-2"
-              >
-                Information
-              </a>
-              <a 
-                className={`nav-item nav-link text-dark ${activeTab === "tab-pane-3" ? "active" : ""}`} 
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab("tab-pane-3");
-                }}
-                href="#tab-pane-3"
-              >
-                Reviews (0)
-              </a>
-            </div>
-
-            <div className="tab-content">
-              <div className={`tab-pane fade ${activeTab === "tab-pane-1" ? "show active" : ""}`} id="tab-pane-1">
-                <h4 className="mb-3">Product Description</h4>
-                <p>Product detailed description goes here...</p>
-                <p>Additional description paragraph...</p>
-              </div>
-
-              <div className={`tab-pane fade ${activeTab === "tab-pane-2" ? "show active" : ""}`} id="tab-pane-2">
-                <h4 className="mb-3">Additional Information</h4>
-                <p>Additional product info...</p>
-                <div className="row">
-                  <div className="col-md-6">
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item px-0">Point 1</li>
-                      <li className="list-group-item px-0">Point 2</li>
-                      <li className="list-group-item px-0">Point 3</li>
-                      <li className="list-group-item px-0">Point 4</li>
-                    </ul>
-                  </div>
-                  <div className="col-md-6">
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item px-0">Point 5</li>
-                      <li className="list-group-item px-0">Point 6</li>
-                      <li className="list-group-item px-0">Point 7</li>
-                      <li className="list-group-item px-0">Point 8</li>
-                    </ul>
+                {/* Additional Info Tab */}
+                <div className={`tab-pane fade ${activeTab === "tab-pane-2" ? "show active" : ""}`}>
+                  <h4 className="mb-3 mb-md-4 fw-bold">Additional Information</h4>
+                  <div className="row">
+                    <div className="col-md-6 mb-3 mb-md-0">
+                      <table className="table table-bordered w-100">
+                        <thead>
+                          <tr style={gradientStyle}>
+                            <th colSpan="2" className="text-white">Product Specifications</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            ["Weight", "0.5 kg"],
+                            ["Dimensions", "30 × 20 × 10 cm"],
+                            ["Materials", "Mesh, Rubber, Foam"]
+                          ].map(([label, value], i) => (
+                            <tr key={i}>
+                              <th className="w-50 bg-light">{label}</th>
+                              <td>{value}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="col-md-6">
+                      <table className="table table-bordered w-100">
+                        <thead>
+                          <tr style={gradientStyle}>
+                            <th colSpan="2" className="text-white">Product Details</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            ["Color", "Black, White, Red, Blue, Green"],
+                            ["Size", "XS, S, M, L, XL"],
+                            ["SKU", "SNK-2023-001"]
+                          ].map(([label, value], i) => (
+                            <tr key={i}>
+                              <th className="w-50 bg-light">{label}</th>
+                              <td>{value}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className={`tab-pane fade ${activeTab === "tab-pane-3" ? "show active" : ""}`} id="tab-pane-3">
-                <div className="row">
-                  <div className="col-md-6">
-                    <h4 className="mb-4">1 review for "Product Name"</h4>
-                    <div className="media mb-4">
-                      <img
-                        src="./assets/images/product-1.jpg"
-                        alt="User"
-                        className="img-fluid mr-3 mt-1"
-                        style={{ width: "45px" }}
-                      />
-                      <div className="media-body">
-                        <h6>
-                          John Doe <small> - <i>01 Jan 2045</i></small>
-                        </h6>
-                        <div className="text-primary mb-2">
-                          <i className="fas fa-star"></i>
-                          <i className="fas fa-star"></i>
-                          <i className="fas fa-star"></i>
-                          <i className="fas fa-star-half-alt"></i>
-                          <i className="far fa-star"></i>
+                {/* Reviews Tab */}
+                <div className={`tab-pane fade ${activeTab === "tab-pane-3" ? "show active" : ""}`}>
+                  <div className="row">
+                    <div className="col-md-6 mb-4 mb-md-0">
+                      <h4 className="mb-3 mb-md-4 fw-bold">Customer Reviews</h4>
+                      
+                      {[
+                        {
+                          img: product1,
+                          name: "John Doe",
+                          date: "January 15, 2023",
+                          rating: 4,
+                          review: "These shoes are incredibly comfortable! I've been wearing them daily for a month and they still look and feel great."
+                        },
+                        {
+                          img: product2,
+                          name: "Jane Smith",
+                          date: "March 2, 2023",
+                          rating: 5,
+                          review: "Perfect fit and very stylish. I get compliments every time I wear them. Highly recommend!"
+                        }
+                      ].map((review, i) => (
+                        <div key={i} className="mb-4 pb-4 border-bottom">
+                          <div className="d-flex align-items-center mb-3">
+                            <div className="me-3">
+                              <img 
+                                src={review.img} 
+                                alt="User" 
+                                className="rounded-circle" 
+                                style={{ width: "50px", height: "50px", objectFit: "cover" }} 
+                              />
+                            </div>
+                            <div>
+                              <h6 className="mb-0">{review.name}</h6>
+                              <small className="text-muted">{review.date}</small>
+                            </div>
+                          </div>
+                          <div className="text-warning mb-2">
+                            {[...Array(5)].map((_, i) => (
+                              <i key={i} className={`fas ${i < review.rating ? 'fa-star' : 'fa-star-half-alt'}`}></i>
+                            ))}
+                          </div>
+                          <p className="text-muted">{review.review}</p>
                         </div>
-                        <p>Review content here...</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-md-6">
-                    <h4 className="mb-4">Leave a review</h4>
-                    <small>Your email address will not be published. Required fields are marked *</small>
-                    <div className="d-flex my-3">
-                      <p className="mb-0 mr-2">Your Rating * :</p>
-                      <div className="text-primary">
-                        <i className="far fa-star"></i>
-                        <i className="far fa-star"></i>
-                        <i className="far fa-star"></i>
-                        <i className="far fa-star"></i>
-                        <i className="far fa-star"></i>
-                      </div>
+                      ))}
                     </div>
 
-                    <form>
-                      <div className="form-group">
-                        <label htmlFor="message">Your Review *</label>
-                        <textarea id="message" cols="30" rows="5" className="form-control"></textarea>
+                    <div className="col-md-6">
+                      <div className="card border-0 shadow-sm rounded-3 h-100">
+                        <div className="card-body p-3 p-md-4">
+                          <h4 className="fw-bold mb-3 mb-md-4">Leave a Review</h4>
+                          <p className="text-muted small mb-3 mb-md-4">
+                            Your email address will not be published. Required fields are marked *
+                          </p>
+                          
+                          <form>
+                            <div className="mb-3 mb-md-4">
+                              <label className="form-label fw-semibold">Your Rating *</label>
+                              <div className="rating-stars">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <React.Fragment key={star}>
+                                    <input 
+                                      type="radio" 
+                                      id={`star-${star}`} 
+                                      name="rating" 
+                                      value={star} 
+                                      className="d-none"
+                                      onChange={() => setRating(star)}
+                                    />
+                                    <label 
+                                      htmlFor={`star-${star}`} 
+                                      className="star-label"
+                                      style={{ color: rating >= star ? '#3498db' : '#e4e5e9' }}
+                                    >
+                                      <i className="fas fa-star"></i>
+                                    </label>
+                                  </React.Fragment>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            <div className="mb-3 mb-md-4">
+                              <label htmlFor="review" className="form-label fw-semibold">Your Review *</label>
+                              <textarea 
+                                id="review" 
+                                rows="5" 
+                                className="form-control" 
+                                placeholder="Share your experience with this product..."
+                                style={{ borderColor: '#3498db' }}
+                              ></textarea>
+                            </div>
+                            
+                            <div className="row g-3 mb-3 mb-md-4">
+                              <div className="col-md-6">
+                                <label htmlFor="name" className="form-label fw-semibold">Name *</label>
+                                <input 
+                                  type="text" 
+                                  className="form-control" 
+                                  id="name" 
+                                  required 
+                                  style={{ borderColor: '#3498db' }}
+                                />
+                              </div>
+                              <div className="col-md-6">
+                                <label htmlFor="email" className="form-label fw-semibold">Email *</label>
+                                <input 
+                                  type="email" 
+                                  className="form-control" 
+                                  id="email" 
+                                  required 
+                                  style={{ borderColor: '#3498db' }}
+                                />
+                              </div>
+                            </div>
+                            
+                            <PrimaryButton fullWidth onClick={() => {}}>
+                              Submit Review
+                            </PrimaryButton>
+                          </form>
+                        </div>
                       </div>
-                      <div className="form-group">
-                        <label htmlFor="name">Your Name *</label>
-                        <input type="text" className="form-control" id="name" />
-                      </div>
-                      <div className="form-group">
-                        <label htmlFor="email">Your Email *</label>
-                        <input type="email" className="form-control" id="email" />
-                      </div>
-                      <div className="form-group mb-0">
-                        <input type="submit" value="Leave Your Review" className="btn btn-primary px-3" />
-                      </div>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
