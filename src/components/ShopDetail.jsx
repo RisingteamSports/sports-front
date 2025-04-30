@@ -85,18 +85,22 @@ const ShopDetail = () => {
     const { onClick } = props;
     return (
       <button 
-        className="slick-arrow slick-prev btn rounded-circle d-none d-lg-flex" 
-        onClick={onClick}
-        style={{
-          ...gradientStyle,
-          left: '-15px',
-          zIndex: 1,
-          width: '40px',
-          height: '40px',
-        }}
-      >
-        <i className="fas fa-chevron-left"></i>
-      </button>
+      className="slick-arrow slick-prev btn rounded-circle d-none d-lg-flex" 
+      onClick={onClick}
+      style={{
+        ...gradientStyle,
+        left: '-15px',
+        zIndex: 1,
+        width: '40px',
+        height: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 0
+      }}
+    >
+      <i className="fas fa-chevron-left"></i>
+    </button>
     );
   }
 
@@ -104,33 +108,26 @@ const ShopDetail = () => {
     const { onClick } = props;
     return (
       <button 
-        className="slick-arrow slick-next btn rounded-circle d-none d-lg-flex" 
-        onClick={onClick}
-        style={{
-          ...gradientStyle,
-          right: '-15px',
-          zIndex: 1,
-          width: '40px',
-          height: '40px',
-        }}
-      >
-        <i className="fas fa-chevron-right"></i>
-      </button>
+  className="slick-arrow slick-next btn rounded-circle d-none d-lg-flex align-items-center justify-content-center p-0"
+  onClick={onClick}
+  style={{
+    ...gradientStyle,
+    right: '-15px',
+    zIndex: 1,
+    width: '40px',
+    height: '40px'
+  }}
+>
+  <i className="fas fa-chevron-right"></i>
+</button>
     );
   }
 
   return (
     <div className="container-fluid pb-5 bg-light">
       <Navbar />
+      
       <div className="container py-3 py-md-5">
-        {/* Breadcrumb */}
-        <nav aria-label="breadcrumb" className="mb-3 mb-md-4">
-          <ol className="breadcrumb bg-transparent px-0">
-            <li className="breadcrumb-item"><a href="#" className="text-decoration-none">Home</a></li>
-            <li className="breadcrumb-item"><a href="#" className="text-decoration-none">Shop</a></li>
-            <li className="breadcrumb-item active" aria-current="page">Product Detail</li>
-          </ol>
-        </nav>
 
         <div className="row">
           {/* Product Images */}
@@ -205,9 +202,6 @@ const ShopDetail = () => {
                       </button>
                     ))}
                   </div>
-                  <a href="#" className="d-block mt-2 text-decoration-none small" style={{ color: '#3498db' }}>
-                    <i className="fas fa-ruler me-1"></i> Size Guide
-                  </a>
                 </div>
 
                 {/* Color Selection */}
@@ -243,44 +237,45 @@ const ShopDetail = () => {
 
                 {/* Quantity and Add to Cart */}
                 <div className="d-flex flex-wrap align-items-center mb-3 mb-md-4 pt-2">
-                  <div className="input-group quantity me-3 mb-2 mb-md-0" style={{ width: "140px" }}>
-                    <button 
-                      className="btn rounded-start"
-                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                      style={gradientStyle}
-                    >
-                      <i className="fas fa-minus"></i>
-                    </button>
-                    <input
-                      type="text"
-                      className="form-control text-center"
-                      value={quantity}
-                      readOnly
-                      style={{
-                        fontWeight: '600',
-                        color: '#2c3e50',
-                        backgroundColor: '#f8f9fa',
-                        border: '1px solid #3498db'
-                      }}
-                    />
-                    <button 
-                      className="btn rounded-end"
-                      onClick={() => setQuantity(q => q + 1)}
-                      style={gradientStyle}
-                    >
-                      <i className="fas fa-plus"></i>
-                    </button>
-                  </div>
-                  <PrimaryButton icon="fa-shopping-cart" onClick={() => {}}>
-                    Add To Cart
-                  </PrimaryButton>
-                  <button 
-                    className="btn btn-outline-danger px-3 px-md-4 py-2 rounded-1 ms-2 ms-md-3 mt-2 mt-md-0"
-                    style={{ fontWeight: '600' }}
-                  >
-                    <i className="fas fa-heart me-2"></i> Wishlist
-                  </button>
-                </div>
+  <div className="d-flex p-2 quantity me-3 mb-2 mb-md-0" style={{ width: "140px" }}>
+    <button 
+      className="btn rounded-start border-0"
+      onClick={() => setQuantity(q => Math.max(1, q - 1))}
+      style={gradientStyle}
+    >
+      <i className="fas fa-minus"></i>
+    </button>
+    <input
+      type="text"
+      className="form-control text-center border-0"
+      value={quantity}
+      readOnly
+      style={{
+        fontWeight: '600',
+        color: '#2c3e50',
+        backgroundColor: '#f8f9fa',
+        border: 'none !important'
+      }}
+    />
+    <button 
+      className="btn rounded-end border-0"
+      onClick={() => setQuantity(q => q + 1)}
+      style={gradientStyle}
+    >
+      <i className="fas fa-plus"></i>
+    </button>
+  </div>
+  
+  {/* Added gap-3 class to create space between buttons */}
+  <div className="d-flex gap-3">
+    <PrimaryButton icon="fa-shopping-cart" onClick={() => {}}>
+      Add To Cart
+    </PrimaryButton>
+    <PrimaryButton onClick={() => {}}>
+      Buy Now
+    </PrimaryButton>
+  </div>
+</div>
 
                 {/* Delivery Info */}
                 <div className="alert alert-light border mb-3 mb-md-4" style={{ borderColor: '#3498db' }}>

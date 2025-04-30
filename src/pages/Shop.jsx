@@ -28,6 +28,52 @@ const Shop = () => {
   return (
     <div className="container-fluid shop-container">
       <Navbar />
+      
+      {/* Search Bar */}
+<div className="row justify-content-center mb-4 py-3" style={{ backgroundColor: '#f8f9fa' }}>
+  <div className="col-md-8 col-10">
+    <div className="d-flex align-items-center">
+      <div className="input-group border flex-grow-1">
+        <input 
+          type="text" 
+          className="form-control" 
+          placeholder="Search products..." 
+          aria-label="Search products"
+          style={{ borderRight: 'none', borderRadius: '0.25rem 0 0 0.25rem' }}
+        />
+        <button 
+          className="btn btn-primary" 
+          type="button"
+          style={{
+            background: 'linear-gradient(135deg, #3498db, #2980b9)',
+            border: 'none',
+            borderRadius: '0 0.25rem 0.25rem 0'
+          }}
+        >
+          <i className="fas fa-search"></i> Search
+        </button>
+      </div>
+      
+      {/* Icons Box */}
+      <div className="ms-2 pb-3 d-flex" style={{ height: 'calc(1.5em + 0.75rem + 40px)' }}>
+        <div className="h-100 d-flex align-items-center" style={{ 
+          backgroundColor: '#f8f9fa', 
+          borderRadius: '0.25rem',
+          padding: '0 0.5rem',
+          border: '1px solid #ced4da'
+        }}>
+          <button className=" p-0 border-0 " title="Wishlist">
+            <i className="far fa-heart fs-2 text-primary"></i>
+          </button>
+          <button className=" p-0 border-0  ms-2" title="Add to Cart">
+            <i className="fas fa-shopping-cart fs-2 text-primary"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
       <div className="row px-xl-5 px-2">
         {/* Mobile Filter Toggle */}
         <div className="col-12 d-lg-none mb-3">
@@ -162,7 +208,6 @@ const Shop = () => {
             {products.map(product => (
               <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-6 mb-4" key={product.id}>
                 <div className="card product-card h-100 border-0 shadow-sm">
-                  <div className="badge bg-danger position-absolute" style={{ top: '0.5rem', right: '0.5rem' }}>Sale</div>
                   <Link to={`/shop-detail/${product.id}`} className="text-decoration-none">
                     <img 
                       src={product.image} 
@@ -178,7 +223,7 @@ const Shop = () => {
                     />
                   </Link>
                   <div className="card-body pt-0 pb-3 px-3">
-                    <div className="d-flex justify-content-between align-items-start mb-1">
+                    <div className="d-flex justify-content-between align-items-start mb-1 pt-4">
                       <Link to={`/shop-detail/${product.id}`} className="text-decoration-none">
                         <h6 className="card-title mb-0 text-dark">{product.name}</h6>
                       </Link>
