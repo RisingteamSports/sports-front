@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import product1 from '../assets/images/product-1.jpg';
 import product2 from '../assets/images/product-2.jpg';
 import product3 from '../assets/images/product-3.jpg';
@@ -13,6 +13,7 @@ import Navbar from '../components/Header/header';
 import "../style/shop.css";
 
 const Shop = () => {
+  const navigate = useNavigate();
   const productImages = [product1, product2, product3, product4, product5, product6, product7, product8, product9];
   
   // Sample product data
@@ -30,49 +31,52 @@ const Shop = () => {
       <Navbar />
       
       {/* Search Bar */}
-<div className="row justify-content-center mb-4 py-3" style={{ backgroundColor: '#f8f9fa' }}>
-  <div className="col-md-8 col-10">
-    <div className="d-flex align-items-center">
-      <div className="input-group border flex-grow-1">
-        <input 
-          type="text" 
-          className="form-control" 
-          placeholder="Search products..." 
-          aria-label="Search products"
-          style={{ borderRight: 'none', borderRadius: '0.25rem 0 0 0.25rem' }}
-        />
-        <button 
-          className="btn btn-primary" 
-          type="button"
-          style={{
-            background: 'linear-gradient(135deg, #3498db, #2980b9)',
-            border: 'none',
-            borderRadius: '0 0.25rem 0.25rem 0'
-          }}
-        >
-          <i className="fas fa-search"></i> Search
-        </button>
-      </div>
-      
-      {/* Icons Box */}
-      <div className="ms-2 pb-3 d-flex" style={{ height: 'calc(1.5em + 0.75rem + 40px)' }}>
-        <div className="h-100 d-flex align-items-center" style={{ 
-          backgroundColor: '#f8f9fa', 
-          borderRadius: '0.25rem',
-          padding: '0 0.5rem',
-          border: '1px solid #ced4da'
-        }}>
-          <button className=" p-0 border-0 " title="Wishlist">
-            <i className="far fa-heart fs-2 text-primary"></i>
-          </button>
-          <button className=" p-0 border-0  ms-2" title="Add to Cart">
-            <i className="fas fa-shopping-cart fs-2 text-primary"></i>
-          </button>
+      <div className="row justify-content-center mb-4 py-3" style={{ backgroundColor: '#f8f9fa' }}>
+        <div className="col-md-8 col-10">
+          <div className="d-flex align-items-center">
+            <div className="input-group border flex-grow-1">
+              <input 
+                type="text" 
+                className="form-control" 
+                placeholder="Search products..." 
+                aria-label="Search products"
+                style={{ borderRight: 'none', borderRadius: '0.25rem 0 0 0.25rem' }}
+              />
+              <button 
+                className="btn btn-primary" 
+                type="button"
+                style={{
+                  background: 'linear-gradient(135deg, #3498db, #2980b9)',
+                  border: 'none',
+                  borderRadius: '0 0.25rem 0.25rem 0'
+                }}
+              >
+                <i className="fas fa-search"></i> Search
+              </button>
+            </div>
+            
+            {/* Icons Box */}
+            <div className="ms-2 pb-3 d-flex" style={{ height: 'calc(1.5em + 0.75rem + 40px)' }}>
+              <div className="h-100 d-flex align-items-center" style={{ 
+                borderRadius: '0.25rem',
+                padding: '0 0.5rem',
+              }}>
+                <button className="p-0 border-0 bg-transparent" title="Wishlist" 
+                  onClick={() => navigate('/favorites')}>
+                  <i className="far fa-heart fs-2"></i>
+                </button>
+                <button 
+                  className="p-0 border-0 ms-2 bg-transparent" 
+                  title="Add to Cart"
+                  onClick={() => navigate('/addcart')}
+                >
+                  <i className="fas fa-shopping-cart fs-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
       <div className="row px-xl-5 px-2">
         {/* Mobile Filter Toggle */}
@@ -228,7 +232,6 @@ const Shop = () => {
                         <h6 className="card-title mb-0 text-dark">{product.name}</h6>
                       </Link>
                         <i className="far fa-heart text-muted"></i>
-                     
                     </div>
                     <div className="mb-2">
                       {[...Array(5)].map((_, i) => (

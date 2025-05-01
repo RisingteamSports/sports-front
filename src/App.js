@@ -12,6 +12,8 @@ import MyTeams from './components/TeamManagement/MyTeams';
 import AllTeams from './components/TeamManagement/AllTeams'; 
 import Shop from './pages/Shop'; // Import the Shop component
 import ShopDetail from './components/ShopDetail';
+import AddCart from './components/shops/AddCart';
+import AddFav from './components/shops/AddFav';
 
 function App() {
   const [lastActivity, setLastActivity] = useState(localStorage.getItem('lastActivity') || Date.now());
@@ -61,6 +63,8 @@ function App() {
           <Route path="/scoreboard" element={<Scoreboard />} />
           <Route path="/shop" element={<ProtectedRoute><Shop /></ProtectedRoute>} /> {/* Added Shop route */}
           <Route path="/shop-detail/:id" element={<ProtectedRoute><ShopDetail /></ProtectedRoute>} />
+          <Route path="/addcart" element={<ProtectedRoute><AddCart /></ProtectedRoute>} />
+          <Route path="/favorites" element={<ProtectedRoute><AddFav /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>

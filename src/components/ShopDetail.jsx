@@ -265,7 +265,6 @@ const ShopDetail = () => {
       <i className="fas fa-plus"></i>
     </button>
   </div>
-  
   {/* Added gap-3 class to create space between buttons */}
   <div className="d-flex gap-3">
     <PrimaryButton icon="fa-shopping-cart" onClick={() => {}}>
