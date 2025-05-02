@@ -179,7 +179,6 @@ const AllMatches = () => {
                   </div>
                 </div>
               </div>
-              
             </div>
 
             {/* Matches List */}
@@ -199,41 +198,39 @@ const AllMatches = () => {
                     <div className="row p-2 cards-container">
                       {filteredMatches.length > 0 ? (
                         filteredMatches.map((match) => (
-                          <div key={match.id} className="col-lg-5 col-md-6 col-12 mb-3 p-1">
+                          <div key={match.id} className="col-lg-4 col-md-6 col-12 mb-3 p-2">
                             <div className="card bg-white text-black p-2 text-center shadow-sm h-100">
-                            <div className="d-flex justify-content-between align-items-center mb-1">
-  <div className="d-flex align-items-center">
-    {match.team_logo ? (
-      <img 
-        src={match.team_logo} 
-        alt="Team Logo" 
-        className="rounded-circle me-2" 
-        style={{ width: "35px", height: "35px", objectFit: "cover", border: "1px solid #ccc" }}
-      />
-    ) : (
-      <div 
-        className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" 
-        style={{ width: "35px", height: "35px", border: "1px solid #ccc" }}
-      >
-        <i className="fas fa-user text-secondary"></i>
-      </div>
-    )}
-    <h5 className="mb-0 fw-bold">{match.team_name}</h5>
-  </div>
-  <p className="text-muted small mb-0">{match.category}</p>
-</div>
-
+                              <div className="d-flex justify-content-between align-items-center mb-1">
+                                <div className="d-flex align-items-center">
+                                  {match.team_logo ? (
+                                    <img 
+                                      src={match.team_logo} 
+                                      alt="Team Logo" 
+                                      className="rounded-circle me-2" 
+                                      style={{ width: "35px", height: "35px", objectFit: "cover", border: "1px solid #ccc" }}
+                                    />
+                                  ) : (
+                                    <div 
+                                      className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" 
+                                      style={{ width: "35px", height: "35px", border: "1px solid #ccc" }}
+                                    >
+                                      <i className="fas fa-user text-secondary"></i>
+                                    </div>
+                                  )}
+                                  <h5 className="mb-0 fw-bold">{match.team_name}</h5>
+                                </div>
+                                <p className="text-muted small mb-0">{match.category}</p>
+                              </div>
 
                               <div className="row align-items-center">
                                 <div className="col-4 text-center">
                                   <p className="mb-0 text-danger fw-bold">
                                     <span className="text-muted small">
-                                    <MatchDetailsPopup
-  match={match}
-  currentUser={currentUser}
-  onRequestClick={() => handleClick(true, match.id, match.user_id)}
-/>
-
+                                      <MatchDetailsPopup
+                                        match={match}
+                                        currentUser={currentUser}
+                                        onRequestClick={() => handleClick(true, match.id, match.user_id)}
+                                      />
                                     </span>
                                   </p>
                                 </div>
@@ -250,24 +247,20 @@ const AllMatches = () => {
                                   </span>
                                 </div>
                                 <div className="col-4 text-center d-flex flex-column align-items-center justify-content-center mt-3">
-  {/* Match Bid */}
-  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
-    Bid <br />
-    <span className="text-muted small mx-1">
-      {match.match_bid === "yes" ? `Rs. ${match.custom_bid ?? "0"}` : "No"}
-    </span>
-  </p>
+                                  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
+                                    Bid <br />
+                                    <span className="text-muted small mx-1">
+                                      {match.match_bid === "yes" ? `Rs. ${match.custom_bid ?? "0"}` : "No"}
+                                    </span>
+                                  </p>
 
-  {/* Security */}
-  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
-    Security <br />
-    <span className="text-muted small mx-1">
-    {match.security == 1 ? `Rs. ${match.security_amount ?? "0"}` : "No"}
-
-    </span>
-  </p>
-</div>
-
+                                  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
+                                    Security <br />
+                                    <span className="text-muted small mx-1">
+                                      {match.security == 1 ? `Rs. ${match.security_amount ?? "0"}` : "No"}
+                                    </span>
+                                  </p>
+                                </div>
 
                                 <div className="col-12 text-center">
                                   <p className="mb-0 text-danger fw-bold d-flex justify-content-center">
@@ -281,7 +274,7 @@ const AllMatches = () => {
                                 {match.match_status === "available" && (
                                   <a
                                     href="#"
-                                    className="btn btn-request w-100  text-decoration-none"
+                                    className="btn btn-request w-100 text-decoration-none"
                                     onClick={() => handleClick(true, match.id, match.user_id)}
                                   >
                                     Request

@@ -96,90 +96,129 @@ const Shop = () => {
           </button>
         </div>
 
-        {/* Shop Sidebar - Collapsible on mobile */}
-        <div className="col-lg-3 col-md-4 collapse d-lg-block" id="shopFilters">
-          {/* Price Filter */}
-          <div className="card rounded-3 shadow-sm mb-4">
-            <div className="card-header bg-white border-0">
-              <h5 className="mb-0 fw-bold">Filter by price</h5>
-            </div>
-            <div className="card-body p-3">
-              <div className="form-check d-flex justify-content-between align-items-center mb-2">
-                <input className="form-check-input" type="checkbox" id="price-all" checked />
-                <label className="form-check-label flex-grow-1 ms-2" htmlFor="price-all">All Price</label>
-                <span className="badge bg-light text-dark">1000</span>
-              </div>
-              {[
-                { id: 'price-1', range: '$0 - $100', count: 150 },
-                { id: 'price-2', range: '$100 - $200', count: 295 },
-                { id: 'price-3', range: '$200 - $300', count: 246 },
-                { id: 'price-4', range: '$300 - $400', count: 145 },
-                { id: 'price-5', range: '$400 - $500', count: 168 }
-              ].map(filter => (
-                <div className="form-check d-flex justify-content-between align-items-center mb-2" key={filter.id}>
-                  <input className="form-check-input" type="checkbox" id={filter.id} />
-                  <label className="form-check-label flex-grow-1 ms-2" htmlFor={filter.id}>{filter.range}</label>
-                  <span className="badge bg-light text-dark">{filter.count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Color Filter */}
-          <div className="card rounded-3 shadow-sm mb-4">
-            <div className="card-header bg-white border-0">
-              <h5 className="mb-0 fw-bold">Filter by color</h5>
-            </div>
-            <div className="card-body p-3">
-              <div className="form-check d-flex justify-content-between align-items-center mb-2">
-                <input className="form-check-input" type="checkbox" id="color-all" checked />
-                <label className="form-check-label flex-grow-1 ms-2" htmlFor="color-all">All Colors</label>
-                <span className="badge bg-light text-dark">1000</span>
-              </div>
-              {[
-                { id: 'color-1', color: 'Black', count: 150 },
-                { id: 'color-2', color: 'White', count: 295 },
-                { id: 'color-3', color: 'Red', count: 246 },
-                { id: 'color-4', color: 'Blue', count: 145 },
-                { id: 'color-5', color: 'Green', count: 168 }
-              ].map(filter => (
-                <div className="form-check d-flex justify-content-between align-items-center mb-2" key={filter.id}>
-                  <input className="form-check-input" type="checkbox" id={filter.id} />
-                  <label className="form-check-label flex-grow-1 ms-2" htmlFor={filter.id}>{filter.color}</label>
-                  <span className="badge bg-light text-dark">{filter.count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Size Filter */}
-          <div className="card rounded-3 shadow-sm mb-4">
-            <div className="card-header bg-white border-0">
-              <h5 className="mb-0 fw-bold">Filter by size</h5>
-            </div>
-            <div className="card-body p-3">
-              <div className="form-check d-flex justify-content-between align-items-center mb-2">
-                <input className="form-check-input" type="checkbox" id="size-all" checked />
-                <label className="form-check-label flex-grow-1 ms-2" htmlFor="size-all">All Sizes</label>
-                <span className="badge bg-light text-dark">1000</span>
-              </div>
-              {[
-                { id: 'size-1', size: 'XS', count: 150 },
-                { id: 'size-2', size: 'S', count: 295 },
-                { id: 'size-3', size: 'M', count: 246 },
-                { id: 'size-4', size: 'L', count: 145 },
-                { id: 'size-5', size: 'XL', count: 168 }
-              ].map(filter => (
-                <div className="form-check d-flex justify-content-between align-items-center mb-2" key={filter.id}>
-                  <input className="form-check-input" type="checkbox" id={filter.id} />
-                  <label className="form-check-label flex-grow-1 ms-2" htmlFor={filter.id}>{filter.size}</label>
-                  <span className="badge bg-light text-dark">{filter.count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+       {/* Shop Sidebar - Collapsible on mobile */}
+{/* Shop Sidebar - Collapsible on mobile */}
+<div className="col-lg-3 col-md-4 collapse d-lg-block" id="shopFilters">
+  {/* Price Filter */}
+  <div className="card rounded-3 shadow-sm mb-4">
+    <div className="card-header bg-white border-0">
+      <h5 className="mb-0 fw-bold">Filter by price</h5>
+    </div>
+    <div className="card-body p-3">
+      <div className="d-flex align-items-center mb-2">
+        <input 
+          className="form-check-input mt-0 me-2" 
+          type="checkbox" 
+          id="price-all" 
+          checked 
+        />
+        <label className="form-check-label flex-grow-1" htmlFor="price-all">
+          All Price
+        </label>
+        <span className="badge bg-light text-dark ms-2">{1000}</span>
+      </div>
+      {[
+        { id: 'price-1', range: '$0 - $100', count: 150 },
+        { id: 'price-2', range: '$100 - $200', count: 295 },
+        { id: 'price-3', range: '$200 - $300', count: 246 },
+        { id: 'price-4', range: '$300 - $400', count: 145 },
+        { id: 'price-5', range: '$400 - $500', count: 168 }
+      ].map(filter => (
+        <div className="d-flex align-items-center mb-2" key={filter.id}>
+          <input 
+            className="form-check-input mt-0 me-2" 
+            type="checkbox" 
+            id={filter.id} 
+          />
+          <label className="form-check-label flex-grow-1" htmlFor={filter.id}>
+            {filter.range}
+          </label>
+          <span className="badge bg-light text-dark ms-2">{filter.count}</span>
         </div>
+      ))}
+    </div>
+  </div>
 
+  {/* Color Filter */}
+  <div className="card rounded-3 shadow-sm mb-4">
+    <div className="card-header bg-white border-0">
+      <h5 className="mb-0 fw-bold">Filter by color</h5>
+    </div>
+    <div className="card-body p-3">
+      <div className="d-flex align-items-center mb-2">
+        <input 
+          className="form-check-input mt-0 me-2" 
+          type="checkbox" 
+          id="color-all" 
+          checked 
+        />
+        <label className="form-check-label flex-grow-1" htmlFor="color-all">
+          All Colors
+        </label>
+        <span className="badge bg-light text-dark ms-2">{1000}</span>
+      </div>
+      {[
+        { id: 'color-1', color: 'Black', count: 150 },
+        { id: 'color-2', color: 'White', count: 295 },
+        { id: 'color-3', color: 'Red', count: 246 },
+        { id: 'color-4', color: 'Blue', count: 145 },
+        { id: 'color-5', color: 'Green', count: 168 }
+      ].map(filter => (
+        <div className="d-flex align-items-center mb-2" key={filter.id}>
+          <input 
+            className="form-check-input mt-0 me-2" 
+            type="checkbox" 
+            id={filter.id} 
+          />
+          <label className="form-check-label flex-grow-1" htmlFor={filter.id}>
+            {filter.color}
+          </label>
+          <span className="badge bg-light text-dark ms-2">{filter.count}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Size Filter */}
+  <div className="card rounded-3 shadow-sm mb-4">
+    <div className="card-header bg-white border-0">
+      <h5 className="mb-0 fw-bold">Filter by size</h5>
+    </div>
+    <div className="card-body p-3">
+      <div className="d-flex align-items-center mb-2">
+        <input 
+          className="form-check-input mt-0 me-2" 
+          type="checkbox" 
+          id="size-all" 
+          checked 
+        />
+        <label className="form-check-label flex-grow-1" htmlFor="size-all">
+          All Sizes
+        </label>
+        <span className="badge bg-light text-dark ms-2">{1000}</span>
+      </div>
+      {[
+        { id: 'size-1', size: 'XS', count: 150 },
+        { id: 'size-2', size: 'S', count: 295 },
+        { id: 'size-3', size: 'M', count: 246 },
+        { id: 'size-4', size: 'L', count: 145 },
+        { id: 'size-5', size: 'XL', count: 168 }
+      ].map(filter => (
+        <div className="d-flex align-items-center mb-2" key={filter.id}>
+          <input 
+            className="form-check-input mt-0 me-2" 
+            type="checkbox" 
+            id={filter.id} 
+          />
+          <label className="form-check-label flex-grow-1" htmlFor={filter.id}>
+            {filter.size}
+          </label>
+          <span className="badge bg-light text-dark ms-2">{filter.count}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
         {/* Shop Products */}
         <div className="col-lg-9 col-md-8">
           <div className="row g-3">

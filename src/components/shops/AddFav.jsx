@@ -83,7 +83,6 @@ const AddFav = () => {
               <th className="text-center">Product</th>
               <th className="text-center">Description</th>
               <th className="text-center">Price</th>
-              <th className="text-center">Availability</th>
               <th className="text-center">Actions</th>
             </tr>
           </thead>
@@ -104,36 +103,28 @@ const AddFav = () => {
                 </td>
                 <td className="align-middle fw-bold">${item.price.toFixed(2)}</td>
                 <td className="align-middle">
-                  {item.inStock ? (
-                    <span className="badge bg-success">In Stock</span>
-                  ) : (
-                    <span className="badge bg-warning text-dark">Out of Stock</span>
-                  )}
-                </td>
-                <td className="align-middle">
                   <div className="d-flex justify-content-center gap-2">
                     <button 
-                      className="btn btn-sm btn-outline-primary"
+                      className=" btn-sm p-0 border-0 bg-transparent text-primary"
                       onClick={() => viewProduct(item.id)}
                       title="View Product"
                     >
-                      <i className="bi bi-eye"></i>
+                      <i className="bi bi-eye fs-5"></i>
                     </button>
                     <button 
-                      className="btn btn-sm"
-                      style={gradientStyle}
+                      className=" btn-sm p-0 border-0 bg-transparent text-primary"
                       onClick={() => moveToCart(item.id)}
                       disabled={!item.inStock}
                       title="Add to Cart"
                     >
-                      <i className="bi bi-cart-plus"></i>
+                      <i className="bi bi-cart-plus fs-5"></i>
                     </button>
                     <button 
-                      className=" rounded-1 p-2 btn-sm btn-outline-danger bg-danger"
+                      className=" btn-sm p-0 border-0 bg-transparent text-danger"
                       onClick={() => removeFromFavorites(item.id)}
                       title="Remove"
                     >
-                      <i className="bi bi-trash"></i>
+                      <i className="bi bi-trash fs-5"></i>
                     </button>
                   </div>
                 </td>
