@@ -172,6 +172,7 @@ const AddCart = () => {
                     </button>
                     <input
                       type=""
+                      
                       min="1"
                       value={item.quantity}
                       onChange={(e) => handleQuantityChange(item.id, e.target.value)}
