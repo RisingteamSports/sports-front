@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import VerticleNav from '../verticleNav';
 import Navbar from '../Header/header';
 import { useParams } from "react-router-dom";
 import axios from 'axios';
@@ -19,7 +18,7 @@ const MyTeamMembers = () => {
     setPopup({ show: true, message, type });
     setTimeout(() => setPopup({ show: false, message: "", type: "" }), 3000);
   };
-  const API_URL = "https://matc.matchdada.com/public/api"; // Correct API URL
+  const API_URL = "https://matc.matchdada.com/public/api";
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
@@ -141,7 +140,6 @@ const MyTeamMembers = () => {
           </Table>
         </TableContainer>
       </div>
-      <VerticleNav />
 
       {isModalOpen && (
         <ModalOverlay>

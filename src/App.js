@@ -14,7 +14,9 @@ import Shop from './pages/Shop'; // Import the Shop component
 import ShopDetail from './components/ShopDetail';
 import AddCart from './components/shops/AddCart';
 import AddFav from './components/shops/AddFav';
-
+import Messenger from './pages/messenger';
+import CheckoutPage from './components/Checkout';
+import NotificationsPage from './pages/Notifications';
 function App() {
   const [lastActivity, setLastActivity] = useState(localStorage.getItem('lastActivity') || Date.now());
 
@@ -57,6 +59,9 @@ function App() {
           <Route path="/contact-us" element={<ProtectedRoute><ContactUs /></ProtectedRoute>} />
           <Route path="/edit-profile" element={<ProtectedRoute><ProfileUpdateModal /></ProtectedRoute>} />
           <Route path="/matches" element={<MatchesManagement />} />
+          <Route path="/chat" element={<Messenger />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/team-members/:id" element={<ProtectedRoute><MyTeamMembers /></ProtectedRoute>} />
           <Route path="/my-teams" element={<ProtectedRoute><MyTeams /></ProtectedRoute>} /> 
           <Route path="/all-teams" element={<ProtectedRoute><AllTeams /></ProtectedRoute>} /> 

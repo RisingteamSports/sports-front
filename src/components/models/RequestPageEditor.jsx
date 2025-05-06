@@ -191,9 +191,8 @@ const RequestPageEditor = ({ onClose, onBack }) => {
             <button
               className="btn btn-success"
               onClick={handleSave}
-              disabled={!inputValue}
             >
-              Save
+              Request
             </button>
             <button className="btn btn-secondary" onClick={onBack}>
               Back

@@ -131,6 +131,8 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
                             <dd className="col-6">
                               {new Date(match.match_datetime).toLocaleTimeString()}
                             </dd>
+                            <dt className="col-6">Venue:</dt>
+                            <dd className="col-6">{match.venue}</dd>
                           </dl>
                         </div>
                       </div>

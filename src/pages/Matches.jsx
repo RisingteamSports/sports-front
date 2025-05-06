@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import VerticleNav from "../components/verticleNav";
 import Navbar from "../components/Header/header";
 import axios from "axios";
 import "../style/matches.css";
@@ -155,199 +154,145 @@ const AllMatches = () => {
   return (
     <>
       {location.pathname !== "/" && <Navbar />}
-      <div className="container">
-        <div className="row">
-          <div className="col-12 m-0">
-            {/* Search and Filter Section */}
-            <div className="p-0">
-              <div className="row px-2">
-                <div className="col-md-12">
-                  <div className="input-group">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Search matches by any field..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <button 
-                      className="btn btn-outline-danger"
-                      onClick={resetFilters}
-                    >
-                      Clear
-                    </button>
-                  </div>
+      <div className="container py-3">
+       
+  
+        {/* Matches List */}
+        <div className="row g-2">
+          {isLoading ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+              <div className="text-center">
+                <div className="spinner-border text-primary" style={{ width: "2rem", height: "2rem" }} role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
+                <p className="mt-2">Loading matches...</p>
               </div>
             </div>
-
-            {/* Matches List */}
-            <div className="container m-auto">
-              <div className="row">
-                <div className="col-12">
-                  {isLoading ? (
-                    <div className="d-flex justify-content-center align-items-center" style={{ height: "300px" }}>
-                      <div className="text-center">
-                        <div className="spinner-border text-primary" style={{ width: "3rem", height: "3rem" }} role="status">
-                          <span className="visually-hidden">Loading...</span>
-                        </div>
-                        <p className="mt-3 fs-5">Loading matches...</p>
+          ) : (
+            filteredMatches.length > 0 ? (
+              filteredMatches.map((match) => (
+                <div key={match.id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                  <div className="card border-0 shadow-sm h-100 hover-shadow transition-all">
+                    {/* Card Header */}
+                    <div className="card-header bg-white border-0 pb-0 d-flex justify-content-between align-items-center">
+                      <div className="d-flex align-items-center">
+                        {match.team_logo ? (
+                          <img 
+                            src={match.team_logo} 
+                            alt="Team Logo" 
+                            className="rounded-circle me-2" 
+                            style={{ 
+                              width: "28px", 
+                              height: "28px", 
+                              objectFit: "cover", 
+                              border: "1px solid #eee" 
+                            }}
+                          />
+                        ) : (
+                          <div 
+                            className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" 
+                            style={{ 
+                              width: "40px", 
+                              height: "40px", 
+                              border: "1px solid #eee" 
+                            }}
+                          >
+                            <i className="fas fa-user text-muted small"></i>
+                          </div>
+                        )}
+                        <h4 className="mb-0 fw-bold text-truncate">{match.team_name}</h4>
+                      </div>
+                      <div className="d-flex justify-content-between mt-1">
+                        <h5 className="fw-medium">{match.category}</h5>
                       </div>
                     </div>
-                  ) : (
-                    <div className="row p-2 cards-container">
-                      {filteredMatches.length > 0 ? (
-                        filteredMatches.map((match) => (
-                          <div key={match.id} className="col-lg-4 col-md-6 col-12 mb-3 p-2">
-                            <div className="card bg-white text-black p-2 text-center shadow-sm h-100">
-                              <div className="d-flex justify-content-between align-items-center mb-1">
-                                <div className="d-flex align-items-center">
-                                  {match.team_logo ? (
-                                    <img 
-                                      src={match.team_logo} 
-                                      alt="Team Logo" 
-                                      className="rounded-circle me-2" 
-                                      style={{ width: "35px", height: "35px", objectFit: "cover", border: "1px solid #ccc" }}
-                                    />
-                                  ) : (
-                                    <div 
-                                      className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" 
-                                      style={{ width: "35px", height: "35px", border: "1px solid #ccc" }}
-                                    >
-                                      <i className="fas fa-user text-secondary"></i>
-                                    </div>
-                                  )}
-                                  <h5 className="mb-0 fw-bold">{match.team_name}</h5>
-                                </div>
-                                <p className="text-muted small mb-0">{match.category}</p>
-                              </div>
-
-                              <div className="row align-items-center">
-                                <div className="col-4 text-center">
-                                  <p className="mb-0 text-danger fw-bold">
-                                    <span className="text-muted small">
-                                      <MatchDetailsPopup
-                                        match={match}
-                                        currentUser={currentUser}
-                                        onRequestClick={() => handleClick(true, match.id, match.user_id)}
-                                      />
-                                    </span>
-                                  </p>
-                                </div>
-                                <div className="col-4 text-right">
-                                  <span className={`badge small ${
-                                    match.match_status === "available" ? "bg-success text-white" :
-                                      match.match_status === "booked" ? "bg-danger text-white" :
-                                        match.match_status === "live" ? "bg-danger text-white" :
-                                          "bg-warning text-white"}`}>
-                                    {match.match_status === "available" ? "Available" :
-                                      match.match_status === "booked" ? "Booked" :
-                                        match.match_status === "live" ? "Live" :
-                                          "Pending"}
-                                  </span>
-                                </div>
-                                <div className="col-4 text-center d-flex flex-column align-items-center justify-content-center mt-3">
-                                  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
-                                    Bid <br />
-                                    <span className="text-muted small mx-1">
-                                      {match.match_bid === "yes" ? `Rs. ${match.custom_bid ?? "0"}` : "No"}
-                                    </span>
-                                  </p>
-
-                                  <p className="mb-0 text-danger fw-bold d-flex align-items-center">
-                                    Security <br />
-                                    <span className="text-muted small mx-1">
-                                      {match.security == 1 ? `Rs. ${match.security_amount ?? "0"}` : "No"}
-                                    </span>
-                                  </p>
-                                </div>
-
-                                <div className="col-12 text-center">
-                                  <p className="mb-0 text-danger fw-bold d-flex justify-content-center">
-                                    Venue:
-                                    <span className="text-muted mx-1 small">{match.venue}</span>
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="card-footer bg-light mt-1">
-                                {match.match_status === "available" && (
-                                  <a
-                                    href="#"
-                                    className="btn btn-request w-100 text-decoration-none"
-                                    onClick={() => handleClick(true, match.id, match.user_id)}
-                                  >
-                                    Request
-                                  </a>
-                                )}
-
-                                {match.match_status === "pending" &&
-                                  (match.user_id === currentUser?.id ? (
-                                    <span
-                                      className="btn btn-danger w-100 text-decoration-none"
-                                      onClick={() => handleClick(false, match.id, match.user_id)}
-                                    >
-                                      Cancel
-                                    </span>
-                                  ) : (
-                                    <a
-                                      href="#"
-                                      className="btn btn-warning w-100 text-decoration-none"
-                                      onClick={() => handleClick(false, match.id, match.user_id)}
-                                    >
-                                      Cancel
-                                    </a>
-                                  ))}
-
-                                {match.match_status === "booked" && (
-                                  <a href="#" className="btn btn-danger w-100 text-decoration-none">
-                                    Details
-                                  </a>
-                                )}
-
-                                {match.match_status === "live" && (
-                                  <a href="/scoreboard" className="btn btn-score w-100 text-decoration-none">
-                                    Score
-                                  </a>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="col-12 text-center py-5">
-                          <h4>No matches found matching your criteria</h4>
-                          <button 
-                            className="btn btn-primary mt-3"
-                            onClick={resetFilters}
-                          >
-                            Clear Filters
-                          </button>
-                        </div>
-                      )}
+  
+                    {/* Card Body */}
+                    <div className="card-body pt-2 pb-1">
+                     
+                      
+                      <div className="d-flex justify-content-between small mb-2">
+                        <span className="text-muted">Venue:</span>
+                        <span className="fw-medium text-truncate" style={{ maxWidth: "150px" }}>{match.venue}</span>
+                      </div>
+                      
+                      <div className="d-flex justify-content-between small mb-2">
+                        <span className="text-muted">Bid:</span>
+                        <span className="fw-medium">
+                          {match.match_bid === "yes" ? `₹${match.custom_bid ?? "0"}` : "None"}
+                        </span>
+                      </div>
+                      
+                      <div className="d-flex justify-content-between small">
+                        <span className="text-muted">Security:</span>
+                        <span className="fw-medium">
+                          {match.security == 1 ? `₹${match.security_amount ?? "0"}` : "None"}
+                        </span>
+                      </div>
                     </div>
-                  )}
+  
+                    {/* Card Footer */}
+                    <div className="card-footer bg-white d-flex justify-content-between border-0 pt-0">
+                      <MatchDetailsPopup
+                        match={match}
+                        currentUser={currentUser}
+                        onRequestClick={() => handleClick(true, match.id, match.user_id)}
+                      >
+                        <button className="btn btn-sm btn-outline-primary w-100">
+                          {match.match_status === "available" && "Request"}
+                          {match.match_status === "pending" && (match.user_id === currentUser?.id ? "Cancel" : "Pending")}
+                          {match.match_status === "booked" && "Details"}
+                          {match.match_status === "live" && "Score"}
+                        </button>
+                      </MatchDetailsPopup>
+                      <span className={`badge badge-sm ${
+                        match.match_status === "available" ? "bg-success" :
+                        match.match_status === "booked" ? "bg-danger" :
+                        match.match_status === "live" ? "bg-primary" :
+                        "bg-warning"}`}>
+                        {match.match_status.charAt(0).toUpperCase() + match.match_status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-12 text-center py-4">
+                <div className="d-flex flex-column align-items-center justify-content-center">
+                  <i className="bi bi-exclamation-circle text-muted fs-1"></i>
+                  <h5 className="mt-2">No matches found</h5>
+                  <p className="text-muted small">Try adjusting your search or filters</p>
+                  <button 
+                    className="btn btn-sm btn-outline-primary mt-2"
+                    onClick={resetFilters}
+                  >
+                    Clear All Filters
+                  </button>
                 </div>
               </div>
+            )
+          )}
+        </div>
+  
+        {/* Toast Notification */}
+        {toast.show && (
+          <div className={`toast show position-fixed bottom-0 end-0 m-3 ${toast.type === "error" ? "bg-danger" : "bg-success"}`} 
+            style={{ zIndex: 1100 }}>
+            <div className="d-flex align-items-center">
+              <div className="toast-body text-white">
+                <i className={`bi ${toast.type === "error" ? "bi-exclamation-triangle" : "bi-check-circle"} me-2`}></i>
+                {toast.message}
+              </div>
+              <button 
+                type="button" 
+                className="btn-close btn-close-white me-2" 
+                onClick={() => setToast({...toast, show: false})}
+                aria-label="Close"
+              ></button>
             </div>
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Toast Notification */}
-      {toast.show && (
-        <div className={`toast show position-fixed top-0 end-0 m-3 ${toast.type === "error" ? "bg-danger" : "bg-success"}`} style={{ zIndex: 1100 }}>
-          <div className="toast-body text-white d-flex justify-content-between align-items-center">
-            {toast.message}
-            <button 
-              type="button" 
-              className="btn-close btn-close-white" 
-              onClick={() => setToast({...toast, show: false})}
-              aria-label="Close"
-            ></button>
-          </div>
-        </div>
-      )}
     </>
   );
 };

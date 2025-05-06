@@ -13,21 +13,7 @@ background-color: var(--light-bg);
 }
 
 
-body.light-theme {
-   
-    /* modal theme */
 
-
-    .navbar{
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-        color: black;
-        border-bottom:1px solid #1a1a1a ;
-      }
-    .navbar-brand{
-        color: black;
-    }
-   
-  }
 
 .Logo-text{
   color: var(--neon-yellow);
@@ -36,7 +22,6 @@ body.light-theme {
 .navbar{
     border-bottom: 3px groove var(--neon-yellow);
     margin-bottom: 10px;
-    color: var(--neon-yellow);
 }
 .navbar-nav {
   margin-right: 190px; /* increase as needed */
@@ -85,22 +70,10 @@ body.light-theme {
     background-color: #FFE600;
 }
 .btn{
-  background-color: var(--neon-yellow) !important; 
+  background-color: var(--neon-yellow) ; 
    color: white;
 }
-.btn-load-more{
-  width: 70px;
-  height: 70px;
-border: none;
-background-color: transparent;
-}
-.btn-load-more img{
-  width: 100%;
-  height: 100%;
-}
-.btn-load-more img:hover{
-  width: 90%;
-}
+
 .logo{
   position: relative;
   top: 40px;

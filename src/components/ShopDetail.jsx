@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Slider from "react-slick";
+import { useNavigate, Link } from "react-router-dom";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import product1 from "../assets/images/product-1.jpg";
@@ -14,7 +15,7 @@ const ShopDetail = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [rating, setRating] = useState(0);
-
+  const navigate = useNavigate();
   // Color definitions with names and hex values
   const colors = [
     { name: "Black", hex: "#2c3e50" },
@@ -270,7 +271,7 @@ const ShopDetail = () => {
     <PrimaryButton icon="fa-shopping-cart" onClick={() => {}}>
       Add To Cart
     </PrimaryButton>
-    <PrimaryButton onClick={() => {}}>
+    <PrimaryButton onClick={() => navigate("/checkout")}>
       Buy Now
     </PrimaryButton>
   </div>
