@@ -4,7 +4,7 @@ import ProfileUpdateModal from "../Edit_profile";
 import CreateMatchModal from "../models/createNewMatch";
 import AccountSummaryModal from "../models/showalanceDetails";
 
-const Navbar = () => {
+const Navbar = ({ onSearch }) => {
   const navigate = useNavigate();
   const [modalView, setModalView] = useState(null);
   const [user, setUser] = useState(null);
@@ -12,7 +12,6 @@ const Navbar = () => {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM8LrGjiUDcvYjUMk7jUJJZo0kK4Y4NzKxmQ&s"
   );
   const [showAccountModal, setShowAccountModal] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const accountStats = {
     matchesWon: 12,
@@ -57,11 +56,7 @@ const Navbar = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setShowSearch(false);
-      setSearchQuery("");
-    }
+    onSearch(searchQuery);
   };
 
   return (
@@ -72,20 +67,8 @@ const Navbar = () => {
             <h3 className="Logo-text m-0">Match Dada</h3>
           </Link>
 
-          <button
-            className="navbar-toggler border-0"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
           <div className="collapse navbar-collapse " id="navbarNav">
-            <ul className="navbar-nav mx-auto " style={{ maxWidth: "600px", width: "100%" }}>
+            <ul className="navbar-nav mx-auto" style={{ maxWidth: "600px", width: "100%" }}>
               <li className="nav-item px-2">
                 <Link to="/" className="nav-link text-dark">Home</Link>
               </li>
@@ -96,7 +79,12 @@ const Navbar = () => {
                 <Link to="/shop" className="nav-link text-dark">Shop</Link>
               </li>
               <li className="nav-item px-2">
-                <Link to="" className="nav-link text-dark" data-bs-toggle={user ? "modal" : ""} data-bs-target={user ? "#createMatchModal" : ""} onClick={(e) => { if (!user) { e.preventDefault(); navigate("/login"); } }}>Match</Link>
+                <Link to="" className="nav-link text-dark"
+                  data-bs-toggle={user ? "modal" : ""}
+                  data-bs-target={user ? "#createMatchModal" : ""}
+                  onClick={(e) => { if (!user) { e.preventDefault(); navigate("/login"); } }}>
+                  Match
+                </Link>
               </li>
               <li className="nav-item px-2">
                 <Link to="/contact-us" className="nav-link text-dark">Contact Us</Link>
@@ -106,60 +94,39 @@ const Navbar = () => {
             <div className="d-flex align-items-center ms-lg-3">
               {user ? (
                 <>
-                  <div className="d-flex align-items-center">
-                    {/* Search Box - Appears below navbar when toggled */}
-<div className="container-fluid">
-  <form 
-    className="d-flex" 
-    onSubmit={handleSearchSubmit}
-    style={{
-      border: '1px solid #ced4da', // Outer border
-    }}
-  >
-    <input
-      type="text"
-      className="form-control border-0 py-2"
-      placeholder="Search matches, teams..."
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      autoFocus
-      style={{
-        boxShadow: 'none', // Remove any shadow
-      }}
-    />
-    <button 
-      className="btn border-0 rounded-0" 
-      type="submit"
-      style={{
-        backgroundColor: 'black',
-        borderLeft: '1px solid #ced4da', // Divider line
-        width: '40px', // Fixed width
-      }}
-    >
-      <i className="bi bi-search"></i>
-    </button>
-  </form>
-</div>
-                    
-                    <span
-        className="text-center text-decoration-none text-white icon-link position-relative"
-        onClick={() => navigate("/notifications")}
-      >
-        <i className="fa fa-bell fs-4 mt-1"></i>
-      </span>
-                    
-                    <span
-                      className=" btn-link text-dark p-1 ms-1 "
-                      onClick={() => navigate("/chat")}
-                      title="Chat"
+                  <form className="d-flex" onSubmit={handleSearchSubmit} style={{ border: '1px solid #ced4da' }}>
+                    <input
+                      type="text"
+                      className="form-control border-0 py-2"
+                      placeholder="Search matches..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <button
+                      className="btn border-0 rounded-0"
+                      type="submit"
+                      style={{
+                        backgroundColor: 'black',
+                        borderLeft: '1px solid #ced4da',
+                        width: '40px',
+                        color: 'white'
+                      }}
                     >
-                      <i className="bi bi-chat-dots-fill fs-5"></i>
-                    </span>
-                  </div>
-                  
+                      <i className="bi bi-search"></i>
+                    </button>
+                  </form>
+
+                  <span className="text-center text-white icon-link position-relative p-1" onClick={() => navigate("/notifications")}>
+                    <i className="fa fa-bell fs-4 mt-1"></i>
+                  </span>
+
+                  <span className="btn-link text-dark p-1 ms-1 mt-2" onClick={() => navigate("/chat")}>
+                    <i className="bi bi-chat-dots-fill fs-5 pt-3"></i>
+                  </span>
+
                   <div className="dropdown ms-2">
                     <span
-                      className=" btn-link text-dark dropdown-toggle p-0 d-flex align-items-center"
+                      className="btn-link text-dark dropdown-toggle p-0 d-flex align-items-center"
                       id="userDropdown"
                       data-bs-toggle="dropdown"
                     >
@@ -187,8 +154,6 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-
-       
       </nav>
 
       {modalView && <ProfileUpdateModal view={modalView} onClose={() => setModalView(null)} />}

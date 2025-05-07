@@ -1,30 +1,25 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Header/header';
-import AllMatches from './Matches';
+import Navbar from '../components/Header/header'; // Ensure the path is correct
+import AllMatches from './Matches'; // Ensure the path is correct
 import '../style/main.css';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    // Yahan tum search ka logic add kar sakte ho, ya kisi state ko update kar sakte ho
-    console.log('Search:', e.target.value);
-  };
-
-  const handleFilter = () => {
-    // Yahan filter button ka logic likho ya modal open kara lo
-    console.log('Filter button clicked');
+  const handleSearchChange = (query) => {
+    setSearchTerm(query); // Update the search term when search query changes
   };
 
   return (
     <>
       <div className="container-fluid">
-        <Navbar />
-        <AllMatches home="home"/>
+        {/* Pass the handleSearchChange function as onSearch to Navbar */}
+        <Navbar onSearch={handleSearchChange} />
+        {/* Pass the searchTerm to AllMatches component to filter the matches */}
+        <AllMatches searchTerm={searchTerm} />
       </div>
     </>
   );
 };
 
-export default Home;
+export default Home;
