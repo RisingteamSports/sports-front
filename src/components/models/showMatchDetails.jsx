@@ -309,6 +309,8 @@ const MatchDetailsPopup = ({ match, currentUser, onRequestClick }) => {
             setShowRequestModal(false);
             setShowModal(true);
           }}
+          match_id={match.id}
+  opponentId={match.user_id}
         />
       )}
 

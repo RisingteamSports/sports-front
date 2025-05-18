@@ -1,79 +1,185 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
 
 const NotificationsPage = () => {
   const [selectedNotification, setSelectedNotification] = useState(null);
-  
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'match',
-      title: 'New Match Request',
-      description: 'John Doe wants to match with you',
-      time: '10 mins ago',
-      status: 'pending',
-      fullDetails: {
-        name: 'John Doe',
-        age: 28,
-        location: 'New York',
-        bio: 'Software engineer who loves hiking and photography',
-        mutualInterests: ['Hiking', 'Photography', 'Travel'],
-        matchPercentage: 87
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('all');
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          throw new Error('Authentication required');
+        }
+
+        const response = await axios.get('https://matc.matchdada.com/public/api/getUserNotifications', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data.success) {
+          const formattedNotifications = response.data.notifications.map(notif => ({
+            id: notif.id,
+            type: 'match',
+            description: notif.description || 'New match request',
+            time: notif.time || 'Just now',
+            status: notif.status || 'unread',
+            matchStatus: notif.matchStatus || 'pending',
+            originalMatchDetails: notif.fullDetails?.match || null,
+            proposedMatchDetails: {
+              matchbid: notif.fullDetails?.matchbid,
+              matchdate: notif.fullDetails?.matchdate,
+              overs: notif.fullDetails?.overs,
+              venue: notif.fullDetails?.venue,
+              rules: Array.isArray(notif.fullDetails?.rules) ? notif.fullDetails.rules : [],
+              paymentmethod: notif.fullDetails?.paymentmethod,
+              message: notif.fullDetails?.message,
+            },
+            sender: notif.fullDetails?.sender || null
+          }));
+          
+          setNotifications(formattedNotifications);
+        } else {
+          throw new Error('Invalid response format');
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || err.message);
+        console.error('Error fetching notifications:', err);
+      } finally {
+        setLoading(false);
       }
-    },
-    {
-      id: 2,
-      type: 'message',
-      title: 'New Message',
-      description: 'Jane Smith sent you a message',
-      time: '1 hour ago',
-      status: 'unread',
-      fullDetails: {
-        preview: 'Hey there! How are you doing?',
-        conversationId: 123
-      }
-    },
-    {
-      id: 3,
-      type: 'match',
-      title: 'Match Accepted',
-      description: 'Mike Johnson accepted your match request',
-      time: 'Yesterday',
-      status: 'accepted',
-      fullDetails: {
-        name: 'Mike Johnson',
-        age: 31,
-        location: 'Chicago',
-        bio: 'Musician and coffee enthusiast',
-        mutualInterests: ['Music', 'Coffee', 'Reading']
-      }
-    },
-    {
-      id: 4,
-      type: 'system',
-      title: 'Profile Viewed',
-      description: 'Someone viewed your profile',
-      time: '2 days ago',
-      status: 'read',
-      fullDetails: {
-        count: 5
-      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  const getUserID = () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    return user?.id;
+  };
+
+  const handleAccept = async (id) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error('Authentication required');
+
+      await axios.post(`https://matc.matchdada.com/public/api/notifications/${id}/accept`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setNotifications(notifications.map(notif => 
+        notif.id === id ? {
+          ...notif, 
+          status: 'read',
+          matchStatus: 'accepted',
+          title: 'Match Accepted'
+        } : notif
+      ));
+      setSelectedNotification(null);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      console.error('Error accepting match:', err);
     }
-  ]);
-
-  const handleAccept = (id) => {
-    setNotifications(notifications.map(notif => 
-      notif.id === id ? {...notif, status: 'accepted'} : notif
-    ));
-    setSelectedNotification(null);
   };
 
-  const handleReject = (id) => {
-    setNotifications(notifications.map(notif => 
-      notif.id === id ? {...notif, status: 'rejected'} : notif
-    ));
-    setSelectedNotification(null);
+  const handleReject = async (id) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error('Authentication required');
+
+      await axios.post(`https://matc.matchdada.com/public/api/notifications/${id}/reject`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setNotifications(notifications.map(notif => 
+        notif.id === id ? {
+          ...notif, 
+          status: 'read',
+          matchStatus: 'rejected',
+          title: 'Match Rejected'
+        } : notif
+      ));
+      setSelectedNotification(null);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      console.error('Error rejecting match:', err);
+    }
   };
+
+  const handleNotificationClick = (notification) => {
+    setSelectedNotification(notification);
+
+    if (notification.status === 'unread') {
+      setNotifications(notifications.map(notif => 
+        notif.id === notification.id ? { ...notif, status: 'read' } : notif
+      ));
+      
+      markAsRead(notification.id);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+      
+      await axios.post(`https://matc.matchdada.com/public/api/notifications/${id}/mark-read`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+    }
+  };
+
+  const filteredNotifications = notifications.filter(notif => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'matches') return notif.type === 'match';
+    if (activeFilter === 'pending') return notif.matchStatus === 'pending';
+    return true;
+  });
+
+  if (loading) {
+    return (
+      <NotificationsContainer>
+        <Sidebar>
+          <SidebarHeader>
+            <h2>Notifications</h2>
+          </SidebarHeader>
+          <LoadingMessage>Loading notifications...</LoadingMessage>
+        </Sidebar>
+        <DetailView>
+          <EmptyState>
+            <h3>Loading...</h3>
+          </EmptyState>
+        </DetailView>
+      </NotificationsContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <NotificationsContainer>
+        <Sidebar>
+          <SidebarHeader>
+            <h2>Notifications</h2>
+          </SidebarHeader>
+          <ErrorMessage>{error}</ErrorMessage>
+        </Sidebar>
+        <DetailView>
+          <EmptyState>
+            <h3>Error loading notifications</h3>
+            <p>{error}</p>
+          </EmptyState>
+        </DetailView>
+      </NotificationsContainer>
+    );
+  }
 
   return (
     <NotificationsContainer>
@@ -81,32 +187,56 @@ const NotificationsPage = () => {
         <SidebarHeader>
           <h2>Notifications</h2>
           <FilterOptions>
-            <FilterButton active>All</FilterButton>
-            <FilterButton>Matches</FilterButton>
-            <FilterButton>Messages</FilterButton>
+            <FilterButton 
+              active={activeFilter === 'all'} 
+              onClick={() => setActiveFilter('all')}
+            >
+              All
+            </FilterButton>
+            <FilterButton 
+              active={activeFilter === 'matches'} 
+              onClick={() => setActiveFilter('matches')}
+            >
+              Matches
+            </FilterButton>
+            <FilterButton 
+              active={activeFilter === 'pending'} 
+              onClick={() => setActiveFilter('pending')}
+            >
+              Pending
+            </FilterButton>
           </FilterOptions>
         </SidebarHeader>
         
         <NotificationsList>
-          {notifications.map(notification => (
-            <NotificationItem 
-              key={notification.id}
-              unread={notification.status === 'unread'}
-              onClick={() => setSelectedNotification(notification)}
-            >
-              <NotificationIcon type={notification.type}>
-                {notification.type === 'match' && '🤝'}
-                {notification.type === 'message' && '💬'}
-                {notification.type === 'system' && 'ℹ️'}
-              </NotificationIcon>
-              <NotificationContent>
-                <NotificationTitle>{notification.title}</NotificationTitle>
-                <NotificationDesc>{notification.description}</NotificationDesc>
-                <NotificationTime>{notification.time}</NotificationTime>
-              </NotificationContent>
-              {notification.status === 'unread' && <UnreadBadge />}
-            </NotificationItem>
-          ))}
+          {filteredNotifications.length === 0 ? (
+            <EmptyListMessage>No notifications found</EmptyListMessage>
+          ) : (
+            filteredNotifications.map(notification => (
+              <NotificationItem 
+                key={notification.id}
+                unread={notification.status === 'unread'}
+                onClick={() => handleNotificationClick(notification)}
+              >
+                <NotificationIcon type={notification.type}>
+                  {notification.type === 'match' && '🤝'}
+                </NotificationIcon>
+                <NotificationContent>
+                  <NotificationTitle>
+                    {notification.matchStatus === 'pending' ? 'Match Request' : 
+                     notification.matchStatus === 'accepted' ? 'Match Accepted' : 
+                     'Match Rejected'}
+                  </NotificationTitle>
+                  <NotificationDesc>{notification.description}</NotificationDesc>
+                  <NotificationTime>{notification.time}</NotificationTime>
+                </NotificationContent>
+                {notification.status === 'unread' && <UnreadBadge />}
+                {notification.matchStatus === 'pending' && (
+                  <PendingBadge>Pending</PendingBadge>
+                )}
+              </NotificationItem>
+            ))
+          )}
         </NotificationsList>
       </Sidebar>
 
@@ -122,61 +252,166 @@ const NotificationsPage = () => {
               <BackButton onClick={() => setSelectedNotification(null)}>
                 &larr; Back
               </BackButton>
-              <DetailTitle>{selectedNotification.title}</DetailTitle>
+              <DetailTitle>
+                {selectedNotification.matchStatus === 'pending' ? 'Match Request' : 
+                 selectedNotification.matchStatus === 'accepted' ? 'Match Accepted' : 
+                 'Match Rejected'}
+              </DetailTitle>
               <DetailTime>{selectedNotification.time}</DetailTime>
             </DetailHeader>
 
             <DetailContent>
               {selectedNotification.type === 'match' && (
                 <>
+                  {/* Sender Profile Section */}
                   <MatchProfile>
-                    <ProfileImage src={`https://i.pravatar.cc/150?img=${selectedNotification.id}`} />
+                    <ProfileImage 
+                      src={selectedNotification.sender?.photo || `https://ui-avatars.com/api/?name=${selectedNotification.sender?.name || 'U'}&background=random`} 
+                      alt="Sender"
+                    />
                     <ProfileInfo>
-                      <ProfileName>{selectedNotification.fullDetails.name}</ProfileName>
-                      <ProfileMeta>{selectedNotification.fullDetails.age} • {selectedNotification.fullDetails.location}</ProfileMeta>
-                      <MatchPercentage>
-                        Match: {selectedNotification.fullDetails.matchPercentage}%
-                      </MatchPercentage>
+                      <ProfileName>
+                        {selectedNotification.sender?.name || 'Unknown User'}
+                        <StatusBadge 
+                          accepted={selectedNotification.matchStatus === 'accepted'}
+                          rejected={selectedNotification.matchStatus === 'rejected'}
+                        >
+                          {selectedNotification.matchStatus === 'pending' ? 'Pending' : 
+                           selectedNotification.matchStatus === 'accepted' ? 'Accepted' : 
+                           'Rejected'}
+                        </StatusBadge>
+                      </ProfileName>
+                      <ProfileMeta>Sent you a match request</ProfileMeta>
                     </ProfileInfo>
                   </MatchProfile>
 
-                  <SectionTitle>About</SectionTitle>
-                  <SectionContent>{selectedNotification.fullDetails.bio}</SectionContent>
+                  {/* Original Match Details Section */}
+                  {selectedNotification.originalMatchDetails && (
+                    <>
+                      <SectionTitle>Original Match Details</SectionTitle>
+                      <MatchDetailsCard>
+                        <DetailRow>
+                          <DetailLabel>Team Name:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.team_name || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Captain:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.captain_name || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Match Date:</DetailLabel>
+                          <DetailValue>
+                            {selectedNotification.originalMatchDetails.match_datetime 
+                              ? new Date(selectedNotification.originalMatchDetails.match_datetime).toLocaleString() 
+                              : 'N/A'}
+                          </DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Venue:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.venue || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>City:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.city || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Province:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.province || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Overs:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.overs || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Ball Type:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.ball_type || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Payment Method:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.payment_method || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Dress Code:</DetailLabel>
+                          <DetailValue>{selectedNotification.originalMatchDetails.dress_code || 'N/A'}</DetailValue>
+                        </DetailRow>
+                        <DetailRow>
+                          <DetailLabel>Rules:</DetailLabel>
+                          <DetailValue>
+                            {selectedNotification.originalMatchDetails.rules && selectedNotification.originalMatchDetails.rules.length > 0 ? (
+                              <RulesList>
+                                {selectedNotification.originalMatchDetails.rules.map((rule, index) => (
+                                  <li key={index}>{rule}</li>
+                                ))}
+                              </RulesList>
+                            ) : 'No rules specified'}
+                          </DetailValue>
+                        </DetailRow>
+                      </MatchDetailsCard>
+                    </>
+                  )}
 
-                  <SectionTitle>Mutual Interests</SectionTitle>
-                  <InterestList>
-                    {selectedNotification.fullDetails.mutualInterests.map((interest, i) => (
-                      <InterestTag key={i}>{interest}</InterestTag>
-                    ))}
-                  </InterestList>
+                  {/* Proposed Match Changes Section */}
+                  <SectionTitle>Proposed Changes</SectionTitle>
+                  <MatchDetailsCard>
+                    {selectedNotification.proposedMatchDetails.matchdate && (
+                      <DetailRow>
+                        <DetailLabel>Proposed Date:</DetailLabel>
+                        <DetailValue>
+                          {new Date(selectedNotification.proposedMatchDetails.matchdate).toLocaleString()}
+                        </DetailValue>
+                      </DetailRow>
+                    )}
+                    {selectedNotification.proposedMatchDetails.overs && (
+                      <DetailRow>
+                        <DetailLabel>Proposed Overs:</DetailLabel>
+                        <DetailValue>{selectedNotification.proposedMatchDetails.overs}</DetailValue>
+                      </DetailRow>
+                    )}
+                    {selectedNotification.proposedMatchDetails.venue && (
+                      <DetailRow>
+                        <DetailLabel>Proposed Venue:</DetailLabel>
+                        <DetailValue>{selectedNotification.proposedMatchDetails.venue}</DetailValue>
+                      </DetailRow>
+                    )}
+                    {selectedNotification.proposedMatchDetails.paymentmethod && (
+                      <DetailRow>
+                        <DetailLabel>Proposed Payment Method:</DetailLabel>
+                        <DetailValue>{selectedNotification.proposedMatchDetails.paymentmethod}</DetailValue>
+                      </DetailRow>
+                    )}
+                    {selectedNotification.proposedMatchDetails.rules && selectedNotification.proposedMatchDetails.rules.length > 0 && (
+                      <DetailRow>
+                        <DetailLabel>Proposed Rules:</DetailLabel>
+                        <DetailValue>
+                          <RulesList>
+                            {selectedNotification.proposedMatchDetails.rules.map((rule, index) => (
+                              <li key={index}>{rule}</li>
+                            ))}
+                          </RulesList>
+                        </DetailValue>
+                      </DetailRow>
+                    )}
+                    {selectedNotification.proposedMatchDetails.message && (
+                      <Section>
+                        <SectionTitle>Message</SectionTitle>
+                        <MessageBox>
+                          {selectedNotification.proposedMatchDetails.message}
+                        </MessageBox>
+                      </Section>
+                    )}
+                  </MatchDetailsCard>
                 </>
-              )}
-
-              {selectedNotification.type === 'message' && (
-                <>
-                  <MessagePreview>
-                    "{selectedNotification.fullDetails.preview}"
-                  </MessagePreview>
-                  <ViewConversationButton>
-                    View Conversation
-                  </ViewConversationButton>
-                </>
-              )}
-
-              {selectedNotification.type === 'system' && (
-                <SystemMessage>
-                  Your profile was viewed {selectedNotification.fullDetails.count} times
-                </SystemMessage>
               )}
             </DetailContent>
 
-            {selectedNotification.type === 'match' && selectedNotification.status === 'pending' && (
+            {selectedNotification.type === 'match' && 
+              selectedNotification.matchStatus === 'pending' && (
               <ActionButtons>
                 <RejectButton onClick={() => handleReject(selectedNotification.id)}>
                   Reject
                 </RejectButton>
                 <AcceptButton onClick={() => handleAccept(selectedNotification.id)}>
-                  Accept Match
+                  Accept
                 </AcceptButton>
               </ActionButtons>
             )}
@@ -201,14 +436,18 @@ const Sidebar = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: #fff;
 `;
 
 const SidebarHeader = styled.div`
   padding: 15px;
   border-bottom: 1px solid #e1e1e1;
+  background-color: #f8f9fa;
 
   h2 {
     margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: #333;
   }
 `;
 
@@ -226,11 +465,17 @@ const FilterButton = styled.button`
   border-radius: 15px;
   font-size: 12px;
   cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: ${props => props.active ? '#0084ff' : '#e0e2e5'};
+  }
 `;
 
 const NotificationsList = styled.div`
   flex: 1;
   overflow-y: auto;
+  background-color: #fff;
 `;
 
 const NotificationItem = styled.div`
@@ -240,6 +485,7 @@ const NotificationItem = styled.div`
   position: relative;
   background-color: ${props => props.unread ? '#f5f9ff' : 'transparent'};
   border-bottom: 1px solid #f0f2f5;
+  transition: background-color 0.2s;
 
   &:hover {
     background-color: #f5f5f5;
@@ -258,21 +504,30 @@ const NotificationIcon = styled.div`
   justify-content: center;
   font-size: 18px;
   margin-right: 15px;
+  flex-shrink: 0;
 `;
 
 const NotificationContent = styled.div`
   flex: 1;
+  min-width: 0;
 `;
 
 const NotificationTitle = styled.h3`
   font-size: 14px;
   margin-bottom: 3px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const NotificationDesc = styled.p`
   font-size: 13px;
   color: #666;
   margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const NotificationTime = styled.span`
@@ -290,11 +545,21 @@ const UnreadBadge = styled.div`
   border-radius: 50%;
 `;
 
+const PendingBadge = styled.span`
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  font-size: 11px;
+  color: #ff9800;
+  font-weight: bold;
+`;
+
 const DetailView = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: #fff;
 `;
 
 const EmptyState = styled.div`
@@ -304,14 +569,18 @@ const EmptyState = styled.div`
   align-items: center;
   height: 100%;
   color: #666;
+  padding: 20px;
+  text-align: center;
 
   h3 {
     margin-bottom: 10px;
     font-weight: normal;
+    color: #333;
   }
 
   p {
     font-size: 14px;
+    color: #999;
   }
 `;
 
@@ -319,6 +588,7 @@ const DetailHeader = styled.div`
   padding: 15px;
   border-bottom: 1px solid #e1e1e1;
   position: relative;
+  background-color: #f8f9fa;
 `;
 
 const BackButton = styled.button`
@@ -329,12 +599,21 @@ const BackButton = styled.button`
   border: none;
   color: #0084ff;
   cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #e3f2fd;
+  }
 `;
 
 const DetailTitle = styled.h2`
   text-align: center;
   font-size: 18px;
   margin-top: 5px;
+  color: #333;
 `;
 
 const DetailTime = styled.div`
@@ -354,6 +633,8 @@ const MatchProfile = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f2f5;
 `;
 
 const ProfileImage = styled.img`
@@ -361,13 +642,20 @@ const ProfileImage = styled.img`
   height: 80px;
   border-radius: 50%;
   margin-right: 20px;
+  object-fit: cover;
+  border: 2px solid #e1e1e1;
 `;
 
-const ProfileInfo = styled.div``;
+const ProfileInfo = styled.div`
+  flex: 1;
+`;
 
 const ProfileName = styled.h3`
   font-size: 20px;
   margin-bottom: 5px;
+  color: #333;
+  display: flex;
+  align-items: center;
 `;
 
 const ProfileMeta = styled.p`
@@ -376,58 +664,71 @@ const ProfileMeta = styled.p`
   font-size: 14px;
 `;
 
-const MatchPercentage = styled.div`
-  color: #4caf50;
+const StatusBadge = styled.span`
+  margin-left: 10px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
   font-weight: bold;
+  background-color: ${props => 
+    props.accepted ? '#e6f7ee' : 
+    props.rejected ? '#feeceb' : '#fff8e6'};
+  color: ${props => 
+    props.accepted ? '#0a8f4f' : 
+    props.rejected ? '#f44336' : '#ff9800'};
 `;
 
 const SectionTitle = styled.h4`
   margin: 20px 0 10px 0;
   color: #666;
-`;
-
-const SectionContent = styled.p`
-  line-height: 1.5;
-`;
-
-const InterestList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`;
-
-const InterestTag = styled.span`
-  background-color: #e3f2fd;
-  color: #1976d2;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 12px;
-`;
-
-const MessagePreview = styled.blockquote`
   font-size: 16px;
-  color: #333;
-  border-left: 3px solid #0084ff;
-  padding-left: 15px;
-  margin: 20px 0;
+  font-weight: 600;
 `;
 
-const ViewConversationButton = styled.button`
-  background-color: #0084ff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-`;
-
-const SystemMessage = styled.div`
+const MatchDetailsCard = styled.div`
+  background: #fff;
+  border-radius: 8px;
   padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 5px;
-  text-align: center;
-  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e1e1;
+`;
+
+const DetailRow = styled.div`
+  display: flex;
+  margin-bottom: 10px;
+  align-items: flex-start;
+`;
+
+const DetailLabel = styled.div`
+  font-weight: 600;
+  color: #333;
+  width: 180px;
+  flex-shrink: 0;
+`;
+
+const DetailValue = styled.div`
+  color: #555;
+  flex: 1;
+`;
+
+const RulesList = styled.ul`
+  margin: 0;
+  padding-left: 20px;
+  li {
+    margin-bottom: 5px;
+  }
+`;
+
+const Section = styled.div`
+  margin-top: 15px;
+`;
+
+const MessageBox = styled.div`
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  border-left: 3px solid #0084ff;
 `;
 
 const ActionButtons = styled.div`
@@ -435,6 +736,7 @@ const ActionButtons = styled.div`
   padding: 15px;
   border-top: 1px solid #e1e1e1;
   gap: 15px;
+  background-color: #f8f9fa;
 `;
 
 const AcceptButton = styled.button`
@@ -446,6 +748,11 @@ const AcceptButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #3d8b40;
+  }
 `;
 
 const RejectButton = styled.button`
@@ -457,6 +764,30 @@ const RejectButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #d32f2f;
+  }
+`;
+
+const LoadingMessage = styled.div`
+  padding: 20px;
+  text-align: center;
+  color: #666;
+`;
+
+const ErrorMessage = styled.div`
+  padding: 20px;
+  text-align: center;
+  color: #f44336;
+  font-weight: bold;
+`;
+
+const EmptyListMessage = styled.div`
+  padding: 20px;
+  text-align: center;
+  color: #666;
 `;
 
 export default NotificationsPage;

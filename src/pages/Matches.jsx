@@ -16,7 +16,6 @@ const AllMatches = ({ searchTerm }) => {
     date: "",
   });
   const API_URL = "https://matc.matchdada.com/public/api";
-
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -33,6 +32,7 @@ const AllMatches = ({ searchTerm }) => {
     const fetchMatches = async () => {
       try {
         const response = await axios.get(`${API_URL}/matches`);
+        console.log(response.data);
         if (response.data.success) {
           setMatches(response.data.data);
         } else {
@@ -159,21 +159,20 @@ const AllMatches = ({ searchTerm }) => {
         {/* Matches List */}
         <div className="row g-2">
           {isLoading ? (
-            <div
-              className="d-flex justify-content-center align-items-center"
-              style={{ height: "200px" }}
-            >
+            <div className="col-12">
+            <div className="d-flex justify-content-center align-items-center py-5">
               <div className="text-center">
-                <div
-                  className="spinner-border text-primary"
-                  style={{ width: "2rem", height: "2rem" }}
+                <div 
+                  className="spinner-grow text-primary" 
+                  style={{ width: "3rem", height: "3rem" }} 
                   role="status"
                 >
                   <span className="visually-hidden">Loading...</span>
                 </div>
-                <p className="mt-2">Loading matches...</p>
+                <p className="mt-3 fs-5 text-muted">Loading matches...</p>
               </div>
             </div>
+          </div>
           ) : filteredMatches.length > 0 ? (
             filteredMatches.map((match) => (
               <div
@@ -181,56 +180,81 @@ const AllMatches = ({ searchTerm }) => {
                 className="col-xl-3 col-lg-4 col-md-6 col-sm-6"
               >
                 <div className="card border-0 shadow-sm h-100 hover-shadow transition-all">
-                  {/* Card Header */}
-                  <div className="card-header bg-white border-0 pb-0 d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center">
-                      {match.team_logo ? (
+                  {/* Card Header with Team Info */}
+                <div className="card-header bg-white border-0 pb-0 d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center">
+                    {match.team_logo ? (
                         <img
-                          src={match.team_logo}
-                          alt="Team Logo"
-                          className="rounded-circle me-2"
-                          style={{
-                            width: "28px",
-                            height: "28px",
-                            objectFit: "cover",
-                            border: "1px solid #eee",
-                          }}
-                        />
+              src={`https://matc.matchdada.com/public/storage/${match.team_logo}`}
+              alt="Team Logo"
+              className="rounded-circle me-2 shadow-sm"
+              style={{
+                width: "40px",
+                height: "40px",
+                objectFit: "cover",
+                border: "2px solid #f8f9fa",
+              }}
+             
+            />
                       ) : (
                         <div
-                          className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
+                          className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2 shadow-sm"
                           style={{
                             width: "40px",
                             height: "40px",
-                            border: "1px solid #eee",
+                            border: "2px solid #f8f9fa",
                           }}
                         >
-                          <i className="fas fa-user text-muted small"></i>
+                          <i className="fas fa-users text-muted"></i>
                         </div>
                       )}
-                      <h4 className="mb-0 fw-bold text-truncate">
+                    <div>
+                      <h5 className="mb-0 fw-bold text-truncate" style={{ maxWidth: "120px" }}>
                         {match.team_name}
-                      </h4>
-                    </div>
-                    <div className="d-flex justify-content-between mt-1">
-                      <h5 className="fw-medium">{match.category}</h5>
+                      </h5>
+                       <div className="d-flex align-items-center">
+                          
+                          
+                          {/* Category Badge */}
+                          <span className="badge bg-light text-dark small fw-normal">
+                            {match.category}
+                          </span>
+                        </div>
                     </div>
                   </div>
+                  {/* Membership Tier Badge with Icon */}
+                          <span className={`badge me-1 ${
+                            match.membership_tier === 'silver' ? 'bg-secondary' :
+                            match.membership_tier === 'gold' ? 'bg-warning text-dark' :
+                            'bg-info'
+                          }`}>
+                            <i className={`membership-icon ${
+                              match.membership_tier === 'silver' ? 'fas fa-award' :
+                              match.membership_tier === 'gold' ? 'fas fa-medal' :
+                              'fas fa-gem'
+                            }`}></i>
+                           
+                          </span>
+                </div>
 
-                  {/* Card Body */}
-                  <div className="card-body pt-2 pb-1">
-                    <div className="d-flex justify-content-between small mb-2">
-                      <span className="text-muted">Venue:</span>
-                      <span
-                        className="fw-medium text-truncate"
-                        style={{ maxWidth: "150px" }}
-                      >
-                        {match.venue}
+                  {/* Card Body with Match Details */}
+                <div className="card-body pt-3 pb-2">
+                  <div className="match-details">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-geo-alt text-muted me-2"></i>
+                        <span className="text-muted small">Venue</span>
+                      </div>
+                      <span className="fw-medium text-truncate" style={{ maxWidth: "150px" }}>
+                        {match.venue || "Not specified"}
                       </span>
                     </div>
 
-                    <div className="d-flex justify-content-between small mb-2">
-                      <span className="text-muted">Bid:</span>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-cash-coin text-muted me-2"></i>
+                        <span className="text-muted small">Bid</span>
+                      </div>
                       <span className="fw-medium">
                         {match.match_bid === "yes"
                           ? `₹${match.custom_bid ?? "0"}`
@@ -238,8 +262,11 @@ const AllMatches = ({ searchTerm }) => {
                       </span>
                     </div>
 
-                    <div className="d-flex justify-content-between small">
-                      <span className="text-muted">Security:</span>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-shield-lock text-muted me-2"></i>
+                        <span className="text-muted small">Security</span>
+                      </div>
                       <span className="fw-medium">
                         {match.security == 1
                           ? `₹${match.security_amount ?? "0"}`
@@ -247,6 +274,7 @@ const AllMatches = ({ searchTerm }) => {
                       </span>
                     </div>
                   </div>
+                </div>
 
                   {/* Card Footer */}
                   <div className="card-footer bg-white d-flex justify-content-between border-0 pt-0">

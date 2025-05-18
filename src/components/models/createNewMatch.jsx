@@ -13,6 +13,7 @@ const CreateMatchModal = () => {
   const [formData, setFormData] = useState({
     teamName: '',
     teamLogo: null,
+    membership_tier: selectedCard,
     captainName: '',
     players: [{ name: '', role: 'Batsman', image: null }],
     category: '',
@@ -142,6 +143,7 @@ const CreateMatchModal = () => {
         user_id: user.id,
         team_name: formData.teamName,
         team_logo: formData.teamLogo,
+        membership_tier: selectedCard,
         captain_name: formData.captainName,
         players: formData.players.map(player => ({
           name: player.name,
@@ -201,7 +203,12 @@ const CreateMatchModal = () => {
       setSubmitting(false);
     }
   };
-
+useEffect(() => {
+  setFormData(prev => ({
+    ...prev,
+    membership_tier: selectedCard
+  }));
+}, [selectedCard]);
   const showToast = (message, type) => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast(prev => ({ ...prev, show: false })), 5000);
@@ -263,50 +270,58 @@ const CreateMatchModal = () => {
           </div>
 
           <div className="modal-body">
-            <div className="row mb-4 text-center">
-              <div className="col-md-4">
-                <div
-                  className={`p-3 rounded shadow ${selectedCard === "silver" ? "bg-primary" : "bg-warning"}`}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setSelectedCard("silver")}
-                >
-                  <img
-                    src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-                    alt="Silver Crown"
-                    style={{ height: '50px' }}
-                  />
-                  <h6 className="mt-2">Silver</h6>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div
-                  className={`p-3 rounded shadow ${selectedCard === "gold" ? "bg-primary" : "bg-warning"}`}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setSelectedCard("gold")}
-                >
-                  <img
-                    src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-                    alt="Gold Crown"
-                    style={{ height: '50px' }}
-                  />
-                  <h6 className="mt-2">Gold</h6>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div
-                  className={`p-3 rounded shadow ${selectedCard === "diamond" ? "bg-primary" : "bg-warning"}`}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setSelectedCard("diamond")}
-                >
-                  <img
-                    src="https://cdn-icons-png.flaticon.com/512/2583/2583448.png"
-                    alt="Diamond Crown"
-                    style={{ height: '50px' }}
-                  />
-                  <h6 className="mt-2">Diamond</h6>
-                </div>
-              </div>
-            </div>
+           <div className="row mb-4">
+  <div className="col-md-4 mb-3 mb-md-0">
+    <div
+      className={`card border-0 p-3 h-100 transition-all ${selectedCard === "silver" ? "border-primary border-2 shadow-sm" : "border-light"}`}
+      style={{ cursor: 'pointer' }}
+      onClick={() => setSelectedCard("silver")}
+    >
+      <div className="text-center">
+        <i className="fas fa-award text-secondary fa-3x mb-3"></i>
+        <h5 className="mb-2">Silver</h5>
+        <p className="text-muted small mb-0">
+          Basic features for casual players Age (15-20)
+        </p>
+      </div>
+      
+    </div>
+  </div>
+
+  <div className="col-md-4 mb-3 mb-md-0">
+    <div
+      className={`card border-0 p-3 h-100 transition-all ${selectedCard === "gold" ? "border-warning border-2 shadow-sm" : "border-light"}`}
+      style={{ cursor: 'pointer' }}
+      onClick={() => setSelectedCard("gold")}
+    >
+      <div className="text-center">
+        <i className="fas fa-medal text-warning fa-3x mb-3"></i>
+        <h5 className="mb-2">Gold</h5>
+        <p className="text-muted small mb-0">
+          Enhanced features for regular players Age (20-30)
+        </p>
+      </div>
+      
+    </div>
+  </div>
+
+  <div className="col-md-4">
+    <div
+      className={`card border-0 p-3 h-100 transition-all ${selectedCard === "diamond" ? "border-info border-2 shadow-sm" : "border-light"}`}
+      style={{ cursor: 'pointer' }}
+      onClick={() => setSelectedCard("diamond")}
+    >
+      <div className="text-center">
+        <i className="fas fa-gem text-info fa-3x mb-3"></i>
+        <h5 className="mb-2">Diamond</h5>
+        <p className="text-muted small mb-0">
+          Premium features for serious competitors  Age (30 above)
+        </p>
+      </div>
+      
+    </div>
+  </div>
+</div>
 
             <div className="stepper-wrapper mb-5">
               {[1, 2, 3].map((step) => (
